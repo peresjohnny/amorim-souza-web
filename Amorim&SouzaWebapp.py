@@ -2,9 +2,6 @@ import re
 import base64
 import streamlit as st
 
-# =========================
-# CONFIG
-# =========================
 APP_NAME = "Amorim & Souza"
 SUBTITLE = "ADVOCACIA"
 LOGO_FILE = "1000423374.jpg"
@@ -22,9 +19,7 @@ PROCESSOS = [
 
 st.set_page_config(page_title=APP_NAME, layout="centered")
 
-# =========================
-# HELPERS
-# =========================
+
 def get_base64(path: str) -> str:
     try:
         with open(path, "rb") as f:
@@ -32,18 +27,16 @@ def get_base64(path: str) -> str:
     except Exception:
         return ""
 
+
 def only_digits(s: str) -> str:
     return re.sub(r"\D+", "", s or "")
 
+
 def is_valid_cpf_digits(cpf_digits: str) -> bool:
     cpf_digits = only_digits(cpf_digits)
-    if len(cpf_digits) != 11:
-        return False
-    return cpf_digits == VALID_CPF
+    return len(cpf_digits) == 11 and cpf_digits == VALID_CPF
 
-# =========================
-# SESSION STATE
-# =========================
+
 if "logado" not in st.session_state:
     st.session_state.logado = False
 if "tela" not in st.session_state:
@@ -53,199 +46,184 @@ if "cpf" not in st.session_state:
 
 img_b64 = get_base64(LOGO_FILE)
 
-# =========================
-# CSS
-# =========================
-st.markdown(f"""
+st.markdown(
+    """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
 
-:root {{
-  --blue: #2D2BBF;
-  --blue-hover: #2523A8;
-  --text-blue: #153B7A;
-  --muted: #8A97B0;
-  --bg: #ffffff;
-  --shadow: 0 14px 32px rgba(0,0,0,.10);
-}}
+:root{
+  --blue:#2D2BBF;
+  --blue-hover:#2523A8;
+  --text-blue:#153B7A;
+  --muted:#8A97B0;
+  --border:#D9DDEA;
+  --shadow: 0 12px 26px rgba(0,0,0,.10);
+}
 
-html, body, [class*="stApp"] {{
-  background: var(--bg) !important;
-  font-family: 'Inter', sans-serif !important;
-}}
+html, body, [class*="stApp"]{
+  background:#fff !important;
+  font-family:'Inter', sans-serif !important;
+}
 
-[data-testid="stHeader"], footer, #MainMenu {{
-  display: none !important;
-}}
+[data-testid="stHeader"], footer, #MainMenu{ display:none !important; }
 
-section.main > div {{
-  padding-top: 0rem !important;
-}}
+section.main > div{ padding-top: 0rem !important; }
 
-[data-testid="stMainBlockContainer"] {{
+[data-testid="stMainBlockContainer"]{
   max-width: 520px !important;
   padding-left: 18px !important;
   padding-right: 18px !important;
   margin: 0 auto !important;
-}}
+}
 
-.hero {{
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
+.hero{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
   margin-top: 10px;
-}}
+}
 
-.logo-crop {{
-  width: 220px;
-  height: 250px;
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-}}
+.logo-crop{
+  width: 240px;
+  height: 260px;
+  overflow:hidden;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+}
 
-.logo-crop img {{
-  width: 220px;
-  transform: translateY(-10px);
-}}
+.logo-crop img{
+  width: 240px;
+  transform: translateY(-6px);
+}
 
-.title {{
-  margin-top: 8px;
+.title{
+  margin-top: 10px;
   font-size: 34px;
   letter-spacing: 3px;
   font-weight: 900;
   color: var(--text-blue);
-}}
+  line-height: 1.05;
+  text-align:center;
+}
 
-.subtitle {{
-  margin-top: 6px;
+.subtitle{
+  margin-top: 8px;
   font-size: 14px;
   letter-spacing: 6px;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--muted);
-}}
+  text-align:center;
+}
 
-div[data-testid="stTextInput"] input {{
-  width: 100% !important;
+.center-wrap{
+  width:100%;
+  margin: 18px auto 0 auto;
+}
+
+div[data-testid="stTextInput"]{
+  width:100% !important;
+}
+
+div[data-testid="stTextInput"] input{
+  width:100% !important;
   height: 54px !important;
   border-radius: 18px !important;
-  border: 2px solid #D9DDEA !important;
-  background: #FFFFFF !important;
+  border: 2px solid var(--border) !important;
+  background:#fff !important;
   font-size: 16px !important;
   padding: 0 16px !important;
-}}
+  outline: none !important;
+  box-shadow: none !important;
+}
 
-div[data-testid="stTextInput"] input:focus {{
+div[data-testid="stTextInput"] input:focus{
   border: 2px solid rgba(45,43,191,.45) !important;
   box-shadow: 0 0 0 6px rgba(45,43,191,.10) !important;
-}}
+  outline: none !important;
+}
 
-.stForm button,
 .stButton > button,
 button[kind="primary"],
-button[data-testid="baseButton-primary"] {{
-    width: 100% !important;
-    height: 56px !important;
-    border-radius: 18px !important;
-    border: none !important;
-    background-color: var(--blue) !important;
-    color: #FFFFFF !important;
-    font-weight: 800 !important;
-    font-size: 16px !important;
-    box-shadow: var(--shadow) !important;
-}}
+button[data-testid="baseButton-primary"]{
+  width:100% !important;
+  height: 54px !important;
+  border-radius: 18px !important;
+  border: none !important;
+  background: var(--blue) !important;
+  color: #fff !important;
+  font-weight: 900 !important;
+  font-size: 16px !important;
+  box-shadow: var(--shadow) !important;
+}
 
-.stForm button:hover,
 .stButton > button:hover,
 button[kind="primary"]:hover,
-button[data-testid="baseButton-primary"]:hover {{
-    background-color: var(--blue-hover) !important;
-}}
+button[data-testid="baseButton-primary"]:hover{
+  background: var(--blue-hover) !important;
+}
 
-.card {{
-  background: #fff;
-  border: 1px solid #E8ECF6;
-  border-radius: 16px;
-  padding: 14px;
-  margin-bottom: 10px;
-  box-shadow: 0 8px 24px rgba(0,0,0,.06);
-  position: relative;
-}}
+.stButton > button:focus{
+  outline: none !important;
+  box-shadow: 0 0 0 6px rgba(45,43,191,.10), var(--shadow) !important;
+}
 
-.badge {{
-  position: absolute;
-  right: 10px;
-  top: 10px;
-  background: #FFD24A;
-  color: #000;
-  font-size: 10px;
-  font-weight: 900;
-  padding: 4px 8px;
-  border-radius: 8px;
-}}
-
-.proc-label {{
-  font-size: 11px;
-  color: #7C879F;
-}}
-
-.proc-num {{
-  font-weight: 800;
-  color: #1F2A44;
-  font-size: 14px;
-}}
-
-.copyright {{
-  text-align: center;
-  color: #B0B8CC;
-  font-size: 12px;
-  letter-spacing: 3px;
-  font-weight: 700;
-  margin-top: 20px;
-}}
+.copyright{
+  text-align:center;
+  color:#B0B8CC;
+  font-size:12px;
+  letter-spacing:3px;
+  font-weight:800;
+  margin-top: 18px;
+}
 </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
-# =========================
-# LOGIN
-# =========================
+
 def render_login():
-    st.markdown(f"""
-    <div class="hero">
-        <div class="logo-crop">
-            <img src="data:image/jpeg;base64,{img_b64}" />
+    st.markdown(
+        f"""
+        <div class="hero">
+            <div class="logo-crop">
+                <img src="data:image/jpeg;base64,{img_b64}" />
+            </div>
+            <div class="title">{APP_NAME.upper()}</div>
+            <div class="subtitle">{SUBTITLE.upper()}</div>
         </div>
-        <div class="title">{APP_NAME.upper()}</div>
-        <div class="subtitle">{SUBTITLE.upper()}</div>
-    </div>
-    """, unsafe_allow_html=True)
+        """,
+        unsafe_allow_html=True,
+    )
 
-    with st.form("login_form", clear_on_submit=False):
+    col_l, col_m, col_r = st.columns([1, 10, 1])
+    with col_m:
+        st.markdown('<div class="center-wrap">', unsafe_allow_html=True)
+
         cpf_input = st.text_input(
             "CPF",
             value=st.session_state.cpf,
             placeholder="CPF (000.000.000-00)",
             label_visibility="collapsed",
         )
-        submitted = st.form_submit_button("Verificar CPF")
+        st.session_state.cpf = cpf_input
 
-    st.session_state.cpf = cpf_input
+        clicked = st.button("Verificar CPF", use_container_width=True)
 
-    if submitted:
-        if is_valid_cpf_digits(cpf_input):
-            st.session_state.logado = True
-            st.session_state.tela = "dashboard"
-            st.rerun()
-        else:
-            st.error("CPF não cadastrado.")
+        st.markdown("</div>", unsafe_allow_html=True)
+
+        if clicked:
+            if is_valid_cpf_digits(cpf_input):
+                st.session_state.logado = True
+                st.session_state.tela = "dashboard"
+                st.rerun()
+            else:
+                st.error("CPF não cadastrado.")
 
     st.markdown('<div class="copyright">© AMR SOFTWARES</div>', unsafe_allow_html=True)
 
-# =========================
-# DASHBOARD
-# =========================
+
 def render_dashboard():
     st.markdown(f"<h3>Olá, {CLIENT_NAME}</h3>", unsafe_allow_html=True)
 
@@ -259,13 +237,32 @@ def render_dashboard():
 
     if st.session_state.tela == "processos":
         for p in PROCESSOS:
-            st.markdown(f"""
-            <div class="card">
-                <div class="badge">ATUALIZAÇÕES</div>
-                <div class="proc-label">Número do Processo</div>
-                <div class="proc-num">{p}</div>
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown(
+                f"""
+                <div style="
+                    background:#fff;
+                    border:1px solid #E8ECF6;
+                    border-radius:16px;
+                    padding:14px;
+                    margin-bottom:10px;
+                    box-shadow:0 8px 24px rgba(0,0,0,.06);
+                    position:relative;">
+                  <div style="
+                      position:absolute;
+                      right:10px;
+                      top:10px;
+                      background:#FFD24A;
+                      color:#000;
+                      font-size:10px;
+                      font-weight:900;
+                      padding:4px 8px;
+                      border-radius:8px;">ATUALIZAÇÕES</div>
+                  <div style="font-size:11px;color:#7C879F;">Número do Processo</div>
+                  <div style="font-weight:900;color:#1F2A44;font-size:14px;">{p}</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
     elif st.session_state.tela == "acordos":
         st.info("Em atualização")
@@ -278,9 +275,7 @@ def render_dashboard():
 
     st.markdown('<div class="copyright">© AMR SOFTWARES</div>', unsafe_allow_html=True)
 
-# =========================
-# ROUTER
-# =========================
+
 if not st.session_state.logado:
     render_login()
 else:
