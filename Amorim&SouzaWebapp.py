@@ -7,7 +7,7 @@ import streamlit as st
 # =========================
 APP_NAME = "AMORIM & SOUZA"
 SUBTITLE = "ADVOCACIA"
-LOGO_FILE = "1000423374.jpg"  # NOME ORIGINAL (não mude)
+LOGO_FILE = "1000423374.jpg"  # NOME ORIGINAL
 VALID_CPF = "79897789120"     # exemplo
 CLIENT_NAME = "Edimar"        # exemplo
 
@@ -19,9 +19,6 @@ PROCESSOS = [
     "0764797-95.2025.8.07.0001",
 ]
 
-# =========================
-# PAGE
-# =========================
 st.set_page_config(page_title=APP_NAME, layout="centered")
 
 # =========================
@@ -62,15 +59,18 @@ st.markdown(f"""
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
 
 :root {{
-  --brand: #1E3A8A;        /* azul do nome */
+  --brand: #1E3A8A;
   --sub: rgba(30,58,138,.55);
   --inputBg: #F3F4F6;
-  --btn: #2D2BBF;          /* azul do botão */
+
+  /* >>> BOTÃO AZUL (mock) <<< */
+  --btn: #2D2BBF;
   --btnHover: #2523A8;
+
   --cardBorder: rgba(30,58,138,.12);
   --shadow: 0 10px 26px rgba(0,0,0,.08);
   --radius: 18px;
-  --padSide: 24px;         /* afastar das bordas */
+  --padSide: 24px;
 }}
 
 * {{ box-sizing: border-box !important; }}
@@ -82,7 +82,6 @@ body {{ overflow:hidden !important; }}
 .block-container {{ padding:0 !important; margin:0 !important; }}
 [data-testid="stMainViewContainer"] {{ padding:0 !important; margin:0 !important; }}
 
-/* Tela cheia no mobile sem rolagem */
 #hero {{
   position: fixed;
   inset: 0;
@@ -116,7 +115,7 @@ body {{ overflow:hidden !important; }}
 .logo-wrap {{
   width: 320px;
   max-width: 82vw;
-  height: 250px;     /* controla o “corte na cintura” */
+  height: 250px;
   overflow: hidden;
   position: relative;
   display:flex;
@@ -127,7 +126,7 @@ body {{ overflow:hidden !important; }}
 
 .logo-img {{
   width: 185%;
-  transform: translateY(-8px); /* ajusta o corte (não come a mão) */
+  transform: translateY(-8px);
 }}
 
 .logo-wrap::after {{
@@ -141,26 +140,33 @@ body {{ overflow:hidden !important; }}
     rgba(255,255,255,1) 100%);
 }}
 
+/* >>> CENTRALIZAÇÃO FORÇADA DO NOME + SUBTÍTULO <<< */
 .brand {{
-  width:100%;
+  width:100% !important;
+  display:block !important;
+  text-align:center !important;
+  margin: 2px auto 0 auto !important;
   color: var(--brand);
   font-weight: 900;
   font-size: 32px;
+  line-height: 1.05;
   letter-spacing: .10em;
-  margin-top: 2px;
+  padding: 0 6px;
 }}
 
 .subtitle {{
-  width:100%;
-  margin-top: 10px;
-  margin-bottom: 18px;
+  width:100% !important;
+  display:block !important;
+  text-align:center !important;
+  margin: 10px auto 18px auto !important;
   color: var(--sub);
   font-weight: 800;
   font-size: 12px;
+  line-height: 1;
   letter-spacing: .25em;
 }}
 
-/* ============ INPUT: matar borda do wrapper (BaseWeb) ============ */
+/* INPUT: matar borda do wrapper */
 div[data-testid="stTextInput"] {{
   width: 100% !important;
 }}
@@ -216,7 +222,7 @@ div[data-testid="stTextInput"] input:-webkit-autofill:focus {{
   outline:none !important;
 }}
 
-/* ============ BUTTON (full width, altura ok, centralizado) ============ */
+/* BOTÃO full width, azul */
 .stButton {{
   width: 100% !important;
   margin-top: 12px !important;
@@ -224,7 +230,7 @@ div[data-testid="stTextInput"] input:-webkit-autofill:focus {{
 
 .stButton > button {{
   width: 100% !important;
-  height: 54px !important;          /* menos grosso */
+  height: 54px !important;
   border-radius: var(--radius) !important;
   border: none !important;
   background: var(--btn) !important;
@@ -247,7 +253,6 @@ div[data-testid="stTextInput"] input:-webkit-autofill:focus {{
   transform: scale(.99) !important;
 }}
 
-/* esconde label de componentes */
 label, small, .stCaption {{ display:none !important; }}
 
 /* copyright fixo */
@@ -263,13 +268,14 @@ label, small, .stCaption {{ display:none !important; }}
   pointer-events:none;
 }}
 
-/* ============ Dashboard ajustes (cards) ============ */
+/* Dashboard */
 .dash-title {{
   color: var(--brand);
   font-weight: 900;
   font-size: 22px;
   letter-spacing: .03em;
   margin: 0 0 10px 0;
+  text-align:center;
 }}
 
 .dash-sub {{
@@ -278,28 +284,7 @@ label, small, .stCaption {{ display:none !important; }}
   font-size: 12px;
   letter-spacing: .10em;
   margin: 0 0 12px 0;
-}}
-
-.action-row {{
-  width:100%;
-  display:flex;
-  gap: 12px;
-  margin-bottom: 14px;
-}}
-
-.action {{
-  flex:1;
-  border-radius: 16px;
-  padding: 14px 12px;
-  border: 1px solid var(--cardBorder);
-  box-shadow: 0 10px 18px rgba(0,0,0,.05);
-  background: #FFFFFF;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap: 10px;
-  font-weight: 800;
-  color: var(--brand);
+  text-align:center;
 }}
 
 .card {{
@@ -354,7 +339,6 @@ def view_login():
       <div class="subtitle">{SUBTITLE}</div>
     """, unsafe_allow_html=True)
 
-    # FORM: Enter também envia
     with st.form("login_form", clear_on_submit=False):
         cpf_visual = st.text_input(
             "CPF",
@@ -363,7 +347,6 @@ def view_login():
             label_visibility="collapsed",
         )
 
-        # normaliza e re-formata
         digits = only_digits(cpf_visual)
         st.session_state["cpf_digits"] = digits
         st.session_state["cpf_visual"] = format_cpf(digits)
@@ -374,7 +357,6 @@ def view_login():
             if len(digits) != 11:
                 st.error("CPF inválido.")
             elif digits == VALID_CPF:
-                # LOGA e vai pro dashboard (não fica só “confirmando”)
                 st.session_state["logado"] = True
                 st.session_state["tela"] = "dashboard"
                 st.rerun()
@@ -390,7 +372,6 @@ def view_dashboard():
     st.markdown(f"<div class='dash-title'>Olá, {CLIENT_NAME}</div>", unsafe_allow_html=True)
     st.markdown("<div class='dash-sub'>Selecione uma opção</div>", unsafe_allow_html=True)
 
-    # Botões estilo “cards” (sem depender do st.button pra layout)
     colA, colB = st.columns(2, gap="small")
 
     with colA:
