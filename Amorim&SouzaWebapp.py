@@ -56,8 +56,9 @@ st.markdown(
   --blue-hover:#2523A8;
   --text-blue:#153B7A;
   --muted:#8A97B0;
-  --border:#D9DDEA;
   --shadow: 0 12px 26px rgba(0,0,0,.10);
+  --field-bg:#F4F6FB;
+  --field-ring:#E5EAF5;
 }
 
 html, body, [class*="stApp"]{
@@ -66,7 +67,6 @@ html, body, [class*="stApp"]{
 }
 
 [data-testid="stHeader"], footer, #MainMenu{ display:none !important; }
-
 section.main > div{ padding-top: 0rem !important; }
 
 [data-testid="stMainBlockContainer"]{
@@ -84,9 +84,10 @@ section.main > div{ padding-top: 0rem !important; }
   margin-top: 10px;
 }
 
+/* CROP REAL (cintura) */
 .logo-crop{
-  width: 240px;
-  height: 260px;
+  width: 280px;
+  height: 220px;            /* menor = corta mais embaixo */
   overflow:hidden;
   display:flex;
   justify-content:center;
@@ -94,12 +95,15 @@ section.main > div{ padding-top: 0rem !important; }
 }
 
 .logo-crop img{
-  width: 240px;
-  transform: translateY(-6px);
+  width: 280px;
+  height: 280px;
+  object-fit: cover;
+  object-position: 50% 10%; /* ajusta o enquadramento (mais alto = mostra mais cabeça/braço) */
+  display:block;
 }
 
 .title{
-  margin-top: 10px;
+  margin-top: 14px;
   font-size: 34px;
   letter-spacing: 3px;
   font-weight: 900;
@@ -122,28 +126,45 @@ section.main > div{ padding-top: 0rem !important; }
   margin: 18px auto 0 auto;
 }
 
+/* INPUT sem borda bugada */
 div[data-testid="stTextInput"]{
   width:100% !important;
+}
+
+div[data-testid="stTextInput"] > div{
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
 }
 
 div[data-testid="stTextInput"] input{
   width:100% !important;
   height: 54px !important;
   border-radius: 18px !important;
-  border: 2px solid var(--border) !important;
-  background:#fff !important;
+
+  border: none !important;
+  outline: none !important;
+
+  background: var(--field-bg) !important;
+
+  /* ring limpo, sem borda feia */
+  box-shadow: 0 0 0 2px var(--field-ring) inset !important;
+
   font-size: 16px !important;
   padding: 0 16px !important;
-  outline: none !important;
-  box-shadow: none !important;
 }
 
 div[data-testid="stTextInput"] input:focus{
-  border: 2px solid rgba(45,43,191,.45) !important;
-  box-shadow: 0 0 0 6px rgba(45,43,191,.10) !important;
+  box-shadow:
+    0 0 0 2px rgba(45,43,191,.35) inset,
+    0 0 0 6px rgba(45,43,191,.10) !important;
+}
+
+div[data-testid="stTextInput"] input:focus-visible{
   outline: none !important;
 }
 
+/* BOTÃO */
 .stButton > button,
 button[kind="primary"],
 button[data-testid="baseButton-primary"]{
