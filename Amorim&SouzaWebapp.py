@@ -30,7 +30,7 @@ if "cpf_visual" not in st.session_state:
 if "cpf_digits" not in st.session_state:
     st.session_state["cpf_digits"] = ""
 
-# logo original do seu github
+# arquivo original no GitHub
 logo_b64 = get_base64("1000423374.jpg")
 
 st.markdown(
@@ -56,50 +56,55 @@ html, body{margin:0 !important; padding:0 !important;}
   font-family: Inter, sans-serif !important;
 }
 
+/* trava largura e centraliza SEM puxar pra esquerda */
 [data-testid="stMainViewContainer"] > div:first-child{
   max-width: 430px !important;
   margin: 0 auto !important;
-  padding-left: 18px !important;
-  padding-right: 18px !important;
+  padding: 0 18px !important;
 }
 
+/* remove paddings internos que bagunçam no mobile */
 .block-container{
-  padding-top: 0px !important;
-  padding-bottom: 28px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
 }
 
-/* ====== FIX DO "PARECE EM BRANCO" NO MOBILE ======
-   Usa viewport dinâmica e coloca conteúdo no topo, sem empurrar pra baixo */
+/* ====== TELA INICIAL SEM ROLAGEM ======
+   Coloca tudo no centro VISÍVEL, sem “tela em branco”.
+   100svh/100dvh funciona melhor no mobile. */
 .page{
-  min-height: 100svh;         /* iOS/Android moderno */
-  min-height: 100dvh;         /* fallback */
+  height: 100svh;
+  height: 100dvh;
   display:flex;
   flex-direction:column;
   align-items:center;
-  justify-content:flex-start; /* NÃO centraliza vertical */
+  justify-content:center;   /* CENTRO real */
   text-align:center;
-  padding-top: 40px;          /* ajuste fino */
+  gap: 10px;
+  overflow: hidden;         /* impede rolagem “vazia” */
 }
 
-/* ===== Logo cortada (na cintura) + fade ===== */
+/* ===== LOGO: CROP REAL (com zoom) =====
+   Seu JPG tem margem branca, então precisa de zoom. */
 .logo-wrapper{
-  width: 230px;
-  height: 175px;              /* <<< CORTE REAL: diminui altura */
+  width: 240px;
+  height: 190px;         /* altura do “corte na cintura” */
   overflow: hidden;
-  margin: 0 auto 8px auto;
-  display: flex;
-  justify-content: center;
   position: relative;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
 }
 
+/* Aqui está o pulo do gato: ZOOM + deslocamento */
 .logo{
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center 5%; /* <<< puxa mais pra cima (cintura corta) */
+  width: 145%;           /* ZOOM */
+  height: auto;
+  transform: translateY(-18px); /* sobe pra cortar a cintura */
   display:block;
 }
 
+/* fade premium */
 .logo-wrapper::after{
   content:"";
   position:absolute;
@@ -116,25 +121,30 @@ html, body{margin:0 !important; padding:0 !important;}
   pointer-events:none;
 }
 
-/* Nome em azul legível */
+/* Títulos */
 .brand{
   font-size: 30px;
   font-weight: 900;
   letter-spacing: .10em;
   color: var(--blueBrand) !important;
-  margin-top: 6px;
+  margin: 0;
 }
 
-/* Subtitulo */
 .subtitle{
   font-size: 12px;
   letter-spacing: .25em;
   font-weight: 800;
   color: rgba(30, 58, 138, .55);
-  margin-bottom: 22px;
+  margin: 0 0 10px 0;
 }
 
-/* Remove wrapper fantasma do input */
+/* ===== INPUT 100% (centralizado) ===== */
+div[data-testid="stTextInput"]{
+  width: 100% !important;
+  max-width: 360px !important;
+  margin: 0 auto !important;
+}
+
 div[data-testid="stTextInput"] > div,
 div[data-testid="stTextInput"] > div > div,
 div[data-testid="stTextInput"] > div > div > div{
@@ -143,14 +153,10 @@ div[data-testid="stTextInput"] > div > div > div{
   box-shadow:none !important;
   padding:0 !important;
   margin:0 !important;
-  height:auto !important;
-  min-height:0 !important;
 }
 
-/* Input */
 div[data-testid="stTextInput"] input{
   width:100% !important;
-  max-width:360px !important;
   height:54px !important;
   border-radius: var(--radius) !important;
   border:1px solid var(--stroke) !important;
@@ -164,19 +170,17 @@ div[data-testid="stTextInput"] input:focus{
   background:#FFF !important;
 }
 
-/* ===== BOTÃO: MESMA LARGURA DO INPUT (FULL) =====
-   Não depende do DOM exato do Streamlit: pega o primary por atributo */
+/* ===== BOTÃO: FULL WIDTH IGUAL INPUT ===== */
 div[data-testid="stFormSubmitButton"]{
   width: 100% !important;
   max-width: 360px !important;
-  margin: 16px auto 0 auto !important;
+  margin: 14px auto 0 auto !important;
   display:block !important;
 }
 
-/* pega o botão primário mesmo que o Streamlit mude o wrapper */
-button[kind="primary"]{
+/* pega qualquer botão dentro do submit (robusto no Streamlit) */
+div[data-testid="stFormSubmitButton"] button{
   width: 100% !important;
-  max-width: 360px !important;
   height: 60px !important;
   border-radius: 16px !important;
   border: none !important;
@@ -186,25 +190,48 @@ button[kind="primary"]{
   font-weight: 800 !important;
   box-shadow: var(--shadowBtn) !important;
 
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  text-align: center !important;
-  padding: 0 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  padding:0 !important;
 
   transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+  position: relative;
+  overflow:hidden;
 }
 
-button[kind="primary"]:hover{
+div[data-testid="stFormSubmitButton"] button::before{
+  content:"";
+  position:absolute;
+  top:-30%;
+  left:-60%;
+  width: 50%;
+  height: 160%;
+  background: linear-gradient(120deg, rgba(255,255,255,0), rgba(255,255,255,.22), rgba(255,255,255,0));
+  transform: rotate(18deg);
+  opacity: 0;
+}
+
+div[data-testid="stFormSubmitButton"] button:hover{
   transform: translateY(-1px);
   box-shadow: var(--shadowBtnHover) !important;
   filter: brightness(1.03);
 }
-
-button[kind="primary"]:active{
+div[data-testid="stFormSubmitButton"] button:hover::before{
+  animation: sheen 0.85s ease;
+  opacity: 1;
+}
+div[data-testid="stFormSubmitButton"] button:active{
   transform: translateY(0px) scale(.99);
   filter: brightness(.99);
   box-shadow: var(--shadowBtn) !important;
+}
+
+@keyframes sheen{
+  0%   { left:-60%; opacity:0; }
+  20%  { opacity:1; }
+  100% { left:120%; opacity:0; }
 }
 
 small, .stCaption { display:none !important; }
