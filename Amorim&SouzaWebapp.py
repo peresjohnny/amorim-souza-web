@@ -45,7 +45,7 @@ def format_cpf(d: str) -> str:
 # STATE
 # =========================
 st.session_state.setdefault("logado", False)
-st.session_state.setdefault("tela", "login")  # login | dashboard | processos
+st.session_state.setdefault("tela", "login")  # login | dashboard | processos | acordos
 st.session_state.setdefault("cpf_visual", "")
 st.session_state.setdefault("cpf_digits", "")
 
@@ -105,7 +105,6 @@ st.markdown(f"""
 
   --radius: 18px;
   --padSide: 22px;
-
   --headerH: 56px;
 
   --warnBg: #FFD54A;
@@ -120,16 +119,12 @@ html, body {{ margin:0 !important; padding:0 !important; height:100% !important;
 .block-container {{ padding:0 !important; margin:0 !important; }}
 [data-testid="stMainViewContainer"] {{ padding:0 !important; margin:0 !important; }}
 
-/* =========================
-   LAYOUT ROOT
-========================= */
 #hero {{
   position: fixed;
   inset: 0;
   background: #FFFFFF;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 0;
 }}
 
 .hero-inner {{
@@ -142,9 +137,7 @@ html, body {{ margin:0 !important; padding:0 !important; height:100% !important;
 
 label, small, .stCaption {{ display:none !important; }}
 
-/* =========================
-   TOP BAR (Dashboard/Processos)
-========================= */
+/* TOP BAR */
 .topbar {{
   position: sticky;
   top: 0;
@@ -159,7 +152,6 @@ label, small, .stCaption {{ display:none !important; }}
   letter-spacing: .06em;
   box-shadow: 0 10px 24px rgba(0,0,0,.10);
 }}
-
 .topbar-inner {{
   width: 420px;
   max-width: 94vw;
@@ -169,32 +161,37 @@ label, small, .stCaption {{ display:none !important; }}
   justify-content:center;
   position: relative;
 }}
-
-.back-btn {{
-  position: absolute;
+.backwrap {{
+  position:absolute;
   left: var(--padSide);
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+}}
+.backwrap .stButton {{
+  margin:0 !important;
+}}
+.backwrap .stButton > button {{
+  height: 40px !important;
+  min-height: 40px !important;
+  width: 44px !important;
+  border-radius: 12px !important;
+  background: rgba(255,255,255,.12) !important;
+  border: 1px solid rgba(255,255,255,.22) !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}}
+.backwrap .stButton > button:active {{
+  transform: scale(.98) !important;
+}}
+.backsvg {{
   display:flex;
   align-items:center;
   justify-content:center;
-  color: rgba(255,255,255,.92);
-  background: rgba(255,255,255,.12);
-  border: 1px solid rgba(255,255,255,.20);
+  color: rgba(255,255,255,.95);
 }}
+.backsvg svg {{ width: 18px; height: 18px; }}
 
-.back-btn svg {{
-  width: 18px; height: 18px;
-}}
-
-.back-btn:active {{
-  transform: scale(.98);
-}}
-
-/* =========================
-   LOGIN HERO (logo + nome)
-========================= */
+/* LOGIN */
 .logo-wrap {{
   width: 320px;
   max-width: 82vw;
@@ -206,12 +203,10 @@ label, small, .stCaption {{ display:none !important; }}
   align-items:flex-start;
   margin: 0 auto 10px auto;
 }}
-
 .logo-img {{
   width: 185%;
   transform: translateY(-8px);
 }}
-
 .logo-wrap::after {{
   content:"";
   position:absolute;
@@ -222,7 +217,6 @@ label, small, .stCaption {{ display:none !important; }}
     rgba(255,255,255,.88) 55%,
     rgba(255,255,255,1) 100%);
 }}
-
 .brand {{
   width:100% !important;
   display:block !important;
@@ -235,7 +229,6 @@ label, small, .stCaption {{ display:none !important; }}
   letter-spacing: .10em;
   padding: 0 6px;
 }}
-
 .subtitle {{
   width:100% !important;
   display:block !important;
@@ -248,19 +241,15 @@ label, small, .stCaption {{ display:none !important; }}
   letter-spacing: .25em;
 }}
 
-/* =========================
-   INPUT (sem borda feia)
-========================= */
+/* INPUT (sem borda feia) */
 div[data-testid="stTextInput"] {{
   width: 100% !important;
 }}
-
 div[data-testid="stTextInput"] [data-baseweb="base-input"] {{
   border: none !important;
   box-shadow: none !important;
   background: transparent !important;
 }}
-
 div[data-testid="stTextInput"] [data-baseweb="input"] {{
   width:100% !important;
   border: none !important;
@@ -269,7 +258,6 @@ div[data-testid="stTextInput"] [data-baseweb="input"] {{
   background: var(--inputBg) !important;
   border-radius: var(--radius) !important;
 }}
-
 div[data-testid="stTextInput"] input {{
   width:100% !important;
   height: 54px !important;
@@ -284,36 +272,16 @@ div[data-testid="stTextInput"] input {{
   -webkit-appearance: none !important;
   appearance: none !important;
 }}
-
 div[data-testid="stTextInput"] [data-baseweb="input"]:focus-within {{
   background: #FFFFFF !important;
   box-shadow: 0 0 0 2px rgba(45,43,191,.14) !important;
 }}
 
-div[data-testid="stTextInput"] input:invalid,
-div[data-testid="stTextInput"] input:focus:invalid {{
-  border:none !important;
-  outline:none !important;
-  box-shadow:none !important;
-}}
-
-div[data-testid="stTextInput"] input:-webkit-autofill,
-div[data-testid="stTextInput"] input:-webkit-autofill:hover,
-div[data-testid="stTextInput"] input:-webkit-autofill:focus {{
-  -webkit-text-fill-color:#111827 !important;
-  box-shadow: 0 0 0px 1000px var(--inputBg) inset !important;
-  border:none !important;
-  outline:none !important;
-}}
-
-/* =========================
-   BUTTON PRIMARY
-========================= */
+/* Botão padrão (login/voltar/sair) */
 .stButton {{
   width: 100% !important;
   margin-top: 12px !important;
 }}
-
 .stButton > button {{
   width: 100% !important;
   height: 54px !important;
@@ -330,18 +298,14 @@ div[data-testid="stTextInput"] input:-webkit-autofill:focus {{
   text-align:center !important;
   padding: 0 16px !important;
 }}
-
 .stButton > button:hover {{
   background: var(--btnHover) !important;
 }}
-
 .stButton > button:active {{
   transform: scale(.99) !important;
 }}
 
-/* =========================
-   DASHBOARD USER CARD
-========================= */
+/* User card */
 .user-card {{
   width: 100%;
   background: #FFFFFF;
@@ -356,7 +320,6 @@ div[data-testid="stTextInput"] input:-webkit-autofill:focus {{
   margin-bottom: 16px;
   text-align:left;
 }}
-
 .user-avatar {{
   width: 44px;
   height: 44px;
@@ -368,14 +331,12 @@ div[data-testid="stTextInput"] input:-webkit-autofill:focus {{
   justify-content:center;
   color: var(--btn);
 }}
-
 .user-title {{
   font-size: 20px;
   font-weight: 900;
   color: var(--brand);
   line-height: 1.1;
 }}
-
 .user-sub {{
   font-size: 12px;
   font-weight: 800;
@@ -384,9 +345,7 @@ div[data-testid="stTextInput"] input:-webkit-autofill:focus {{
   margin-top: 3px;
 }}
 
-/* =========================
-   DASHBOARD ACTION CARDS (2 col)
-========================= */
+/* ACTION CARDS: o próprio st.button vira card (100% clicável) */
 .action-grid {{
   width: 100%;
   display:grid;
@@ -395,18 +354,34 @@ div[data-testid="stTextInput"] input:-webkit-autofill:focus {{
   margin-top: 8px;
 }}
 
-.action-btn {{
-  width: 100%;
-  border-radius: 20px;
-  border: 1px solid var(--cardBorder);
-  background: #FFFFFF;
-  box-shadow: var(--shadowSoft);
-  padding: 18px 14px;
+.actionBtn .stButton {{
+  margin: 0 !important;
+}}
+.actionBtn .stButton > button {{
+  height: auto !important;
+  min-height: 148px !important;
+  padding: 16px 14px !important;
+  border-radius: 20px !important;
+  border: 1px solid var(--cardBorder) !important;
+  background: #FFFFFF !important;
+  box-shadow: var(--shadowSoft) !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+}}
+.actionBtn .stButton > button:hover {{
+  background: #FFFFFF !important;
+}}
+.actionBtn .stButton > button:active {{
+  transform: scale(.99) !important;
+}}
+
+.action-inner {{
   display:flex;
   flex-direction: column;
   align-items:flex-start;
-  justify-content:center;
   gap: 10px;
+  width: 100%;
 }}
 
 .action-icon {{
@@ -427,7 +402,6 @@ div[data-testid="stTextInput"] input:-webkit-autofill:focus {{
   letter-spacing: .08em;
   color: var(--brand);
 }}
-
 .action-hint {{
   font-size: 12px;
   font-weight: 700;
@@ -435,29 +409,7 @@ div[data-testid="stTextInput"] input:-webkit-autofill:focus {{
   margin-top: -4px;
 }}
 
-.action-btn:active {{
-  transform: scale(.99);
-}}
-
-/* remover estilo feio do st.button wrapper pra esses cards */
-div.action-click > div {{
-  margin: 0 !important;
-}}
-div.action-click .stButton {{
-  margin: 0 !important;
-}}
-div.action-click .stButton > button {{
-  all: unset !important;
-  display:block !important;
-  width:100% !important;
-}}
-div.action-click .stButton > button:focus {{
-  outline: none !important;
-}}
-
-/* =========================
-   PROCESS CARDS
-========================= */
+/* PROCESS CARDS */
 .proc-card {{
   width:100%;
   border-radius: 18px;
@@ -468,7 +420,6 @@ div.action-click .stButton > button:focus {{
   margin-bottom: 12px;
   text-align:left;
 }}
-
 .proc-tag {{
   display:inline-block;
   background: var(--warnBg);
@@ -480,14 +431,11 @@ div.action-click .stButton > button:focus {{
   letter-spacing: .06em;
   margin-bottom: 10px;
 }}
-
 .proc-label {{
   font-size: 11px;
   color: rgba(30,58,138,.70);
   font-weight: 800;
-  letter-spacing: .02em;
 }}
-
 .proc-number {{
   font-size: 14px;
   color: #111827;
@@ -495,9 +443,7 @@ div.action-click .stButton > button:focus {{
   margin-top: 6px;
 }}
 
-/* =========================
-   COPYRIGHT
-========================= */
+/* Copyright */
 .copy {{
   position: fixed;
   bottom: 14px;
@@ -511,6 +457,31 @@ div.action-click .stButton > button:focus {{
 }}
 </style>
 """, unsafe_allow_html=True)
+
+# =========================
+# UI helpers
+# =========================
+def _back_svg():
+    return """
+    <span class="backsvg">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"
+           xmlns="http://www.w3.org/2000/svg">
+        <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.4"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+    """
+
+def topbar(title: str, show_back: bool = False, back_to: str = "dashboard"):
+    st.markdown('<div class="topbar"><div class="topbar-inner">', unsafe_allow_html=True)
+    if show_back:
+        st.markdown('<div class="backwrap">', unsafe_allow_html=True)
+        if st.button(_back_svg(), key=f"back_{title}", help="Voltar"):
+            st.session_state["tela"] = back_to
+            st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown(f"<div>{title}</div>", unsafe_allow_html=True)
+    st.markdown('</div></div>', unsafe_allow_html=True)
 
 # =========================
 # VIEWS
@@ -553,45 +524,11 @@ def view_login():
     st.markdown("</div></div>", unsafe_allow_html=True)
     st.markdown('<div class="copy">© AMR SOFTWARES</div>', unsafe_allow_html=True)
 
-
-def _back_svg():
-    return """
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"
-         xmlns="http://www.w3.org/2000/svg">
-      <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.4"
-            stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    """
-
-
-def topbar(title: str, show_back: bool = False):
-    back_html = ""
-    if show_back:
-        back_html = f"""
-        <div class="back-btn" onclick="window.scrollTo(0,0)">
-          {_back_svg()}
-        </div>
-        """
-
-    st.markdown(
-        f"""
-        <div class="topbar">
-          <div class="topbar-inner">
-            {back_html}
-            <div>{title}</div>
-          </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
 def view_dashboard():
     st.markdown('<div id="hero">', unsafe_allow_html=True)
     topbar("Dashboard", show_back=False)
     st.markdown('<div class="hero-inner">', unsafe_allow_html=True)
 
-    # User card (como o mock)
     st.markdown(
         f"""
         <div class="user-card">
@@ -605,53 +542,47 @@ def view_dashboard():
         unsafe_allow_html=True,
     )
 
-    # Botões minimalistas (2 col) - sem emojis
     st.markdown('<div class="action-grid">', unsafe_allow_html=True)
 
     col1, col2 = st.columns(2, gap="small")
 
     with col1:
-        st.markdown('<div class="action-click">', unsafe_allow_html=True)
-        if st.button(" ", key="go_processos", use_container_width=True):
-            st.session_state["tela"] = "processos"
-            st.rerun()
-        st.markdown(
+        st.markdown('<div class="actionBtn">', unsafe_allow_html=True)
+        if st.button(
             f"""
-            <div class="action-btn" onclick="document.querySelector('button[kind][data-testid],button').click()">
+            <div class="action-inner">
               <div class="action-icon">{ICON_DOC}</div>
               <div class="action-label">PROCESSOS</div>
               <div class="action-hint">Consultar andamento</div>
             </div>
             """,
-            unsafe_allow_html=True,
-        )
+            key="btn_processos",
+            use_container_width=True,
+        ):
+            st.session_state["tela"] = "processos"
+            st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
 
     with col2:
-        st.markdown('<div class="action-click">', unsafe_allow_html=True)
-        if st.button(" ", key="go_acordos", use_container_width=True):
-            st.session_state["tela"] = "acordos"
-            st.rerun()
-        st.markdown(
+        st.markdown('<div class="actionBtn">', unsafe_allow_html=True)
+        if st.button(
             f"""
-            <div class="action-btn" onclick="document.querySelectorAll('button')[document.querySelectorAll('button').length-1].click()">
+            <div class="action-inner">
               <div class="action-icon">{ICON_HANDSHAKE}</div>
               <div class="action-label">ACORDOS</div>
               <div class="action-hint">Ver propostas</div>
             </div>
             """,
-            unsafe_allow_html=True,
-        )
+            key="btn_acordos",
+            use_container_width=True,
+        ):
+            st.session_state["tela"] = "acordos"
+            st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # Conteúdo da tela “acordos” (placeholder)
-    if st.session_state.get("tela") == "acordos":
-        st.info("Em atualização")
-
-    # Sair
-    if st.button("SAIR", use_container_width=True):
+    if st.button("SAIR", use_container_width=True, key="sair_dash"):
         st.session_state["logado"] = False
         st.session_state["tela"] = "login"
         st.session_state["cpf_visual"] = ""
@@ -661,10 +592,9 @@ def view_dashboard():
     st.markdown("</div></div>", unsafe_allow_html=True)
     st.markdown('<div class="copy">© AMR SOFTWARES</div>', unsafe_allow_html=True)
 
-
 def view_processos():
     st.markdown('<div id="hero">', unsafe_allow_html=True)
-    topbar("Processos", show_back=True)
+    topbar("Processos", show_back=True, back_to="dashboard")
     st.markdown('<div class="hero-inner">', unsafe_allow_html=True)
 
     for p in PROCESSOS:
@@ -679,9 +609,15 @@ def view_processos():
             unsafe_allow_html=True,
         )
 
-    if st.button("VOLTAR", use_container_width=True):
-        st.session_state["tela"] = "dashboard"
-        st.rerun()
+    st.markdown("</div></div>", unsafe_allow_html=True)
+    st.markdown('<div class="copy">© AMR SOFTWARES</div>', unsafe_allow_html=True)
+
+def view_acordos():
+    st.markdown('<div id="hero">', unsafe_allow_html=True)
+    topbar("Acordos", show_back=True, back_to="dashboard")
+    st.markdown('<div class="hero-inner">', unsafe_allow_html=True)
+
+    st.info("Em atualização")
 
     st.markdown("</div></div>", unsafe_allow_html=True)
     st.markdown('<div class="copy">© AMR SOFTWARES</div>', unsafe_allow_html=True)
@@ -692,7 +628,10 @@ def view_processos():
 if not st.session_state["logado"]:
     view_login()
 else:
-    if st.session_state["tela"] == "processos":
+    tela = st.session_state["tela"]
+    if tela == "processos":
         view_processos()
+    elif tela == "acordos":
+        view_acordos()
     else:
         view_dashboard()
