@@ -57,6 +57,7 @@ body{overflow:hidden !important;}
 .block-container{ padding:0 !important; margin:0 !important; }
 [data-testid="stMainViewContainer"]{ padding:0 !important; margin:0 !important; }
 
+/* ===== Overlay definitivo ===== */
 #hero{
   position: fixed !important;
   inset: 0 !important;
@@ -66,7 +67,7 @@ body{overflow:hidden !important;}
   justify-content:center !important;
   background:#FFFFFF !important;
   overflow:hidden !important;
-  padding: 22px 18px !important;
+  padding: 22px 18px 56px 18px !important; /* espaço pro copyright */
   text-align:center !important;
 }
 
@@ -87,11 +88,11 @@ body{overflow:hidden !important;}
   margin: 0 auto !important;
 }
 
-/* ===== LOGO: ajustada pra NÃO cortar a mão ===== */
+/* ===== LOGO (igual ao que já ficou bom) ===== */
 .logo-wrapper{
   width: 320px;
   max-width: 82vw;
-  height: 260px;              /* <<< aumentei (antes 240) */
+  height: 260px;
   overflow:hidden;
   position:relative;
   display:flex;
@@ -103,7 +104,7 @@ body{overflow:hidden !important;}
 .logo{
   width: 190%;
   height: auto;
-  transform: translateY(-14px); /* <<< desci (antes -30) = preserva mão */
+  transform: translateY(-14px);
   display:block;
 }
 
@@ -111,7 +112,7 @@ body{overflow:hidden !important;}
   content:"";
   position:absolute;
   left:0; right:0; bottom:0;
-  height: 86px;               /* ligeiramente maior pro fade acompanhar */
+  height: 86px;
   background: linear-gradient(
     180deg,
     rgba(255,255,255,0) 0%,
@@ -141,6 +142,7 @@ body{overflow:hidden !important;}
   width:100%;
 }
 
+/* ===== FORM CENTRALIZADO ===== */
 .form-wrap{
   width:100% !important;
   max-width: 360px !important;
@@ -148,12 +150,14 @@ body{overflow:hidden !important;}
   display:block !important;
 }
 
-div[data-testid="stForm"]{
+/* força o <form> a ocupar toda a largura e centralizar */
+#hero form{
   width:100% !important;
-  display:block !important;
+  max-width: 360px !important;
   margin: 0 auto !important;
 }
 
+/* ===== INPUT ===== */
 div[data-testid="stTextInput"]{
   width:100% !important;
   max-width: 360px !important;
@@ -186,29 +190,48 @@ div[data-testid="stTextInput"] input:focus{
   background:#FFF !important;
 }
 
-div[data-testid="stFormSubmitButton"]{
+/* =========================================================
+   ===== BOTÃO: CORREÇÃO DEFINITIVA (pega TODOS wrappers) =====
+   Streamlit às vezes cria wrappers com fit-content.
+   Aqui a gente força: wrapper -> 100% / block / flex:1
+   ========================================================= */
+
+/* pega qualquer bloco de botão dentro do hero */
+#hero .stButton,
+#hero div.stButton,
+#hero [data-testid="stFormSubmitButton"],
+#hero [data-testid="stFormSubmitButton"] > div{
   width:100% !important;
   max-width: 360px !important;
-  margin: 14px auto 0 auto !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+  display:block !important;
+}
+
+/* alguns builds colocam o botão dentro de flex containers */
+#hero [data-testid="stFormSubmitButton"]{
+  margin-top: 14px !important;
+}
+
+/* força o wrapper imediato virar flex 100% */
+#hero [data-testid="stFormSubmitButton"] > div{
   display:flex !important;
   justify-content:center !important;
 }
 
-div[data-testid="stFormSubmitButton"] > div{
-  width:100% !important;
+/* força stButton wrapper virar flex e ocupar tudo */
+#hero .stButton{
   display:flex !important;
-}
-div[data-testid="stFormSubmitButton"] .stButton{
   width:100% !important;
-  display:flex !important;
 }
-div[data-testid="stFormSubmitButton"] .stButton > button{
+#hero .stButton > button{
   flex: 1 1 auto !important;
 }
 
-div[data-testid="stFormSubmitButton"] button,
-button[kind="primary"],
-.stButton > button{
+/* botão final */
+#hero button,
+#hero button[kind="primary"],
+#hero .stButton > button{
   width:100% !important;
   min-width:100% !important;
   height:64px !important;
@@ -227,13 +250,11 @@ button[kind="primary"],
   padding:0 !important;
 
   transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
-  position:relative;
-  overflow:hidden;
+  position:relative !important;
+  overflow:hidden !important;
 }
 
-div[data-testid="stFormSubmitButton"] button::before,
-button[kind="primary"]::before,
-.stButton > button::before{
+#hero button::before{
   content:"";
   position:absolute;
   top:-30%;
@@ -244,34 +265,40 @@ button[kind="primary"]::before,
   transform: rotate(18deg);
   opacity: 0;
 }
-
-div[data-testid="stFormSubmitButton"] button:hover,
-button[kind="primary"]:hover,
-.stButton > button:hover{
+#hero button:hover{
   transform: translateY(-1px);
   box-shadow: var(--shadowBtnHover) !important;
   filter: brightness(1.03);
 }
-div[data-testid="stFormSubmitButton"] button:hover::before,
-button[kind="primary"]:hover::before,
-.stButton > button:hover::before{
+#hero button:hover::before{
   animation: sheen .85s ease;
   opacity: 1;
 }
-div[data-testid="stFormSubmitButton"] button:active,
-button[kind="primary"]:active,
-.stButton > button:active{
+#hero button:active{
   transform: translateY(0px) scale(.99);
   filter: brightness(.99);
   box-shadow: var(--shadowBtn) !important;
 }
-
 @keyframes sheen{
   0%   { left:-60%; opacity:0; }
   20%  { opacity:1; }
   100% { left:120%; opacity:0; }
 }
 
+/* ===== COPYRIGHT FIXO ===== */
+.copy{
+  position: fixed;
+  left:0; right:0;
+  bottom: 14px;
+  text-align:center;
+  font-size: 11px;
+  letter-spacing: .14em;
+  font-weight: 700;
+  color: rgba(30, 58, 138, .45);
+  pointer-events:none;
+}
+
+/* limpa coisas */
 small, .stCaption { display:none !important; }
 label{display:none !important;}
 </style>
@@ -319,3 +346,6 @@ if submitted:
         st.error("CPF não cadastrado.")
 
 st.markdown('</div></div>', unsafe_allow_html=True)
+
+# copyright
+st.markdown('<div class="copy">© AMR SOFTWARES</div>', unsafe_allow_html=True)
