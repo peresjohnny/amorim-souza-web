@@ -30,8 +30,7 @@ if "cpf_visual" not in st.session_state:
 if "cpf_digits" not in st.session_state:
     st.session_state["cpf_digits"] = ""
 
-# arquivo original no GitHub
-logo_b64 = get_base64("1000423374.jpg")
+logo_b64 = get_base64("1000423374.jpg")  # NOME ORIGINAL
 
 st.markdown(
     """
@@ -43,64 +42,77 @@ st.markdown(
   --blueTop: #2D2BBF;
   --blueBot: #1F1C8F;
   --stroke: rgba(17,24,39,.10);
-  --radius: 16px;
-  --shadowBtn: 0 16px 34px rgba(0,0,0,.16);
-  --shadowBtnHover: 0 22px 44px rgba(0,0,0,.18);
+  --radius: 18px;
+  --shadowBtn: 0 18px 40px rgba(0,0,0,.18);
+  --shadowBtnHover: 0 24px 54px rgba(0,0,0,.22);
 }
 
+/* Remove chrome do Streamlit */
 [data-testid="stHeader"], footer, #MainMenu{display:none !important;}
-html, body{margin:0 !important; padding:0 !important;}
+html, body{margin:0 !important; padding:0 !important; height:100% !important;}
+body{overflow:hidden !important;}              /* <<< SEM ROLAGEM */
 
+/* App clean */
 .stApp{
   background:#FFFFFF !important;
   font-family: Inter, sans-serif !important;
 }
 
-/* trava largura e centraliza SEM puxar pra esquerda */
-[data-testid="stMainViewContainer"] > div:first-child{
-  max-width: 430px !important;
-  margin: 0 auto !important;
-  padding: 0 18px !important;
-}
-
-/* remove paddings internos que bagunçam no mobile */
+/* Mata paddings que criam “buraco” */
 .block-container{
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
+  padding:0 !important;
+  margin:0 !important;
 }
 
-/* ====== TELA INICIAL SEM ROLAGEM ======
-   Coloca tudo no centro VISÍVEL, sem “tela em branco”.
-   100svh/100dvh funciona melhor no mobile. */
-.page{
-  height: 100svh;
-  height: 100dvh;
+/* Container principal do Streamlit (garante centralização) */
+[data-testid="stMainViewContainer"]{
+  padding:0 !important;
+  margin:0 !important;
+}
+
+/* ====== SOLUÇÃO DEFINITIVA: tela fixa full-screen ======
+   Mesmo que o Streamlit injete margens, isso fica por cima e centraliza tudo.
+*/
+#hero{
+  position: fixed;
+  inset: 0;
   display:flex;
   flex-direction:column;
   align-items:center;
-  justify-content:center;   /* CENTRO real */
+  justify-content:center;
+  background:#FFFFFF;
+  overflow:hidden;                 /* sem scroll */
+  padding: 24px 18px;
   text-align:center;
-  gap: 10px;
-  overflow: hidden;         /* impede rolagem “vazia” */
 }
 
-/* ===== LOGO: CROP REAL (com zoom) =====
-   Seu JPG tem margem branca, então precisa de zoom. */
+/* Largura “app-like” */
+.hero-inner{
+  width:100%;
+  max-width: 380px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+/* ===== LOGO: maior + crop real ===== */
 .logo-wrapper{
-  width: 240px;
-  height: 190px;         /* altura do “corte na cintura” */
-  overflow: hidden;
-  position: relative;
+  width: 300px;          /* <<< maior */
+  max-width: 78vw;
+  height: 230px;         /* “cintura” */
+  overflow:hidden;
+  position:relative;
   display:flex;
   align-items:flex-start;
   justify-content:center;
+  margin-bottom: 10px;
 }
 
-/* Aqui está o pulo do gato: ZOOM + deslocamento */
+/* zoom real + deslocamento */
 .logo{
-  width: 145%;           /* ZOOM */
+  width: 185%;           /* <<< zoom forte (porque seu jpg tem ar branco) */
   height: auto;
-  transform: translateY(-18px); /* sobe pra cortar a cintura */
+  transform: translateY(-28px); /* <<< sobe pra cortar a cintura */
   display:block;
 }
 
@@ -108,26 +120,24 @@ html, body{margin:0 !important; padding:0 !important;}
 .logo-wrapper::after{
   content:"";
   position:absolute;
-  left:0;
-  right:0;
-  bottom:0;
-  height: 70px;
+  left:0; right:0; bottom:0;
+  height: 76px;
   background: linear-gradient(
     180deg,
     rgba(255,255,255,0) 0%,
-    rgba(255,255,255,0.80) 55%,
+    rgba(255,255,255,0.82) 55%,
     rgba(255,255,255,1) 100%
   );
   pointer-events:none;
 }
 
-/* Títulos */
+/* Textos */
 .brand{
-  font-size: 30px;
+  font-size: 32px;
   font-weight: 900;
   letter-spacing: .10em;
-  color: var(--blueBrand) !important;
-  margin: 0;
+  color: var(--blueBrand);
+  margin: 2px 0 2px 0;
 }
 
 .subtitle{
@@ -135,16 +145,18 @@ html, body{margin:0 !important; padding:0 !important;}
   letter-spacing: .25em;
   font-weight: 800;
   color: rgba(30, 58, 138, .55);
-  margin: 0 0 10px 0;
+  margin: 0 0 18px 0;
 }
 
-/* ===== INPUT 100% (centralizado) ===== */
-div[data-testid="stTextInput"]{
-  width: 100% !important;
-  max-width: 360px !important;
-  margin: 0 auto !important;
+/* ===== INPUT E BOTÃO: mesma largura, centralizados ===== */
+.form-wrap{
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
 }
 
+/* tira wrappers do input */
+div[data-testid="stTextInput"]{ width:100% !important; }
 div[data-testid="stTextInput"] > div,
 div[data-testid="stTextInput"] > div > div,
 div[data-testid="stTextInput"] > div > div > div{
@@ -155,9 +167,10 @@ div[data-testid="stTextInput"] > div > div > div{
   margin:0 !important;
 }
 
+/* input */
 div[data-testid="stTextInput"] input{
   width:100% !important;
-  height:54px !important;
+  height:56px !important;
   border-radius: var(--radius) !important;
   border:1px solid var(--stroke) !important;
   padding:0 16px !important;
@@ -170,22 +183,23 @@ div[data-testid="stTextInput"] input:focus{
   background:#FFF !important;
 }
 
-/* ===== BOTÃO: FULL WIDTH IGUAL INPUT ===== */
+/* submit wrapper */
 div[data-testid="stFormSubmitButton"]{
-  width: 100% !important;
-  max-width: 360px !important;
-  margin: 14px auto 0 auto !important;
-  display:block !important;
+  width:100% !important;
+  margin-top: 14px !important;
 }
 
-/* pega qualquer botão dentro do submit (robusto no Streamlit) */
-div[data-testid="stFormSubmitButton"] button{
-  width: 100% !important;
-  height: 60px !important;
-  border-radius: 16px !important;
-  border: none !important;
+/* ===== botão: força full width em QUALQUER caso ===== */
+div[data-testid="stFormSubmitButton"] button,
+button[kind="primary"],
+.stButton > button{
+  width:100% !important;
+  min-width:100% !important;
+  height:64px !important;                /* <<< grande como no mock */
+  border-radius: 18px !important;
+  border:none !important;
   background: linear-gradient(180deg, var(--blueTop), var(--blueBot)) !important;
-  color: #FFF !important;
+  color:#FFF !important;
   font-size: 17px !important;
   font-weight: 800 !important;
   box-shadow: var(--shadowBtn) !important;
@@ -197,11 +211,13 @@ div[data-testid="stFormSubmitButton"] button{
   padding:0 !important;
 
   transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
-  position: relative;
+  position:relative;
   overflow:hidden;
 }
 
-div[data-testid="stFormSubmitButton"] button::before{
+div[data-testid="stFormSubmitButton"] button::before,
+button[kind="primary"]::before,
+.stButton > button::before{
   content:"";
   position:absolute;
   top:-30%;
@@ -213,16 +229,22 @@ div[data-testid="stFormSubmitButton"] button::before{
   opacity: 0;
 }
 
-div[data-testid="stFormSubmitButton"] button:hover{
+div[data-testid="stFormSubmitButton"] button:hover,
+button[kind="primary"]:hover,
+.stButton > button:hover{
   transform: translateY(-1px);
   box-shadow: var(--shadowBtnHover) !important;
   filter: brightness(1.03);
 }
-div[data-testid="stFormSubmitButton"] button:hover::before{
-  animation: sheen 0.85s ease;
+div[data-testid="stFormSubmitButton"] button:hover::before,
+button[kind="primary"]:hover::before,
+.stButton > button:hover::before{
+  animation: sheen .85s ease;
   opacity: 1;
 }
-div[data-testid="stFormSubmitButton"] button:active{
+div[data-testid="stFormSubmitButton"] button:active,
+button[kind="primary"]:active,
+.stButton > button:active{
   transform: translateY(0px) scale(.99);
   filter: brightness(.99);
   box-shadow: var(--shadowBtn) !important;
@@ -241,26 +263,28 @@ label{display:none !important;}
     unsafe_allow_html=True
 )
 
-st.markdown('<div class="page">', unsafe_allow_html=True)
+# ====== UI em camada fixa (hero) ======
+st.markdown('<div id="hero"><div class="hero-inner">', unsafe_allow_html=True)
 
 st.markdown(
     f"""
     <div class="logo-wrapper">
-        <img src="data:image/jpeg;base64,{logo_b64}" class="logo">
+      <img src="data:image/jpeg;base64,{logo_b64}" class="logo"/>
     </div>
+    <div class="brand">{APP_NAME}</div>
+    <div class="subtitle">{SUBTITLE}</div>
     """,
     unsafe_allow_html=True
 )
 
-st.markdown(f'<div class="brand">{APP_NAME}</div>', unsafe_allow_html=True)
-st.markdown(f'<div class="subtitle">{SUBTITLE}</div>', unsafe_allow_html=True)
+st.markdown('<div class="form-wrap">', unsafe_allow_html=True)
 
 with st.form("cpf_form", clear_on_submit=False):
     cpf_visual = st.text_input(
         "CPF",
         value=st.session_state["cpf_visual"],
         placeholder="CPF (000.000.000-00)",
-        label_visibility="collapsed"
+        label_visibility="collapsed",
     )
 
     cpf_digits = only_digits(cpf_visual)
@@ -269,6 +293,9 @@ with st.form("cpf_form", clear_on_submit=False):
 
     submitted = st.form_submit_button("Verificar CPF")
 
+st.markdown('</div>', unsafe_allow_html=True)  # form-wrap
+
+# mensagens abaixo do form (ainda dentro do hero)
 if submitted:
     if len(st.session_state["cpf_digits"]) != 11:
         st.error("CPF inválido.")
@@ -277,4 +304,4 @@ if submitted:
     else:
         st.error("CPF não cadastrado.")
 
-st.markdown("</div>", unsafe_allow_html=True)
+st.markdown('</div></div>', unsafe_allow_html=True)  # hero-inner + hero
