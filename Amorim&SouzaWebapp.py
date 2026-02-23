@@ -73,7 +73,8 @@ body{overflow:hidden !important;}
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:18px 18px 58px 18px;
+  /* MAIS PADDING LATERAL pra afastar das bordas */
+  padding:18px 26px 58px 26px;
   overflow:hidden;
 }
 .hero-inner{
@@ -88,7 +89,7 @@ body{overflow:hidden !important;}
 }
 
 /* Força centralização de qualquer markdown/elemento do Streamlit dentro do hero */
-#hero .stMarkdown, 
+#hero .stMarkdown,
 #hero [data-testid="stMarkdown"],
 #hero .element-container,
 #hero [data-testid="stVerticalBlock"]{
@@ -101,7 +102,7 @@ body{overflow:hidden !important;}
 .logo-wrapper{
   width:320px;
   max-width:82vw;
-  height:248px;              /* um pouco menor pra não “empurrar” layout */
+  height:248px;
   overflow:hidden;
   position:relative;
   display:flex;
@@ -111,7 +112,7 @@ body{overflow:hidden !important;}
 }
 .logo{
   width:190%;
-  transform:translateY(-10px);   /* ajusta o corte (cintura) sem comer a mão */
+  transform:translateY(-10px);
 }
 .logo-wrapper::after{
   content:"";
@@ -136,7 +137,7 @@ body{overflow:hidden !important;}
 }
 .subtitle{
   width:100%;
-  text-align:center !important;   /* trava no centro */
+  text-align:center !important;
   font-size:12px;
   letter-spacing:.25em;
   font-weight:800;
@@ -144,16 +145,16 @@ body{overflow:hidden !important;}
   margin:10px auto 16px auto;
 }
 
-/* ===== INPUT (remove bordas/outline/efeitos feios e evita corte) ===== */
+/* ===== INPUT (mata a borda bugada do Chrome 100%) ===== */
 div[data-testid="stTextInput"]{
   width:100% !important;
 }
 div[data-testid="stTextInput"] > div{
-  overflow:visible !important;       /* evita “corte” do input */
+  overflow:visible !important;
 }
 div[data-testid="stTextInput"] input{
   width:100% !important;
-  height:54px !important;            /* ligeiramente menor e mais elegante */
+  height:54px !important;
   border-radius:var(--radius) !important;
   border:none !important;
   outline:none !important;
@@ -165,28 +166,48 @@ div[data-testid="stTextInput"] input{
   background:var(--inputBg) !important;
   color:#111827 !important;
 }
-div[data-testid="stTextInput"] input:focus{
+
+/* focus limpo */
+div[data-testid="stTextInput"] input:focus,
+div[data-testid="stTextInput"] input:focus-visible{
   border:none !important;
   outline:none !important;
-  box-shadow:0 0 0 2px rgba(45,43,191,.18) !important; /* glow leve e limpo */
+  box-shadow:0 0 0 2px rgba(45,43,191,.14) !important;
   background:#FFFFFF !important;
 }
 
-/* ===== BUTTON (menos “grosso”) ===== */
+/* remove estilo de invalidação do navegador (aquele anel vermelho/roxo) */
+div[data-testid="stTextInput"] input:invalid{
+  border:none !important;
+  outline:none !important;
+  box-shadow:none !important;
+}
+
+/* Chrome autofill às vezes adiciona borda/sombra: neutraliza */
+div[data-testid="stTextInput"] input:-webkit-autofill,
+div[data-testid="stTextInput"] input:-webkit-autofill:hover,
+div[data-testid="stTextInput"] input:-webkit-autofill:focus{
+  -webkit-text-fill-color:#111827 !important;
+  box-shadow:0 0 0px 1000px var(--inputBg) inset !important;
+  border:none !important;
+  outline:none !important;
+}
+
+/* ===== BUTTON ===== */
 .stButton{
   width:100% !important;
   margin-top:12px !important;
 }
 .stButton > button{
   width:100% !important;
-  height:56px !important;            /* reduz altura */
+  height:56px !important;
   border-radius:var(--radius) !important;
   border:none !important;
   background:var(--btn) !important;
   color:#FFF !important;
   font-size:16px !important;
   font-weight:800 !important;
-  box-shadow:0 3px 10px rgba(0,0,0,.10) !important;  /* mais flat */
+  box-shadow:0 3px 10px rgba(0,0,0,.10) !important;
   display:flex !important;
   align-items:center !important;
   justify-content:center !important;
@@ -196,7 +217,6 @@ div[data-testid="stTextInput"] input:focus{
 .stButton > button:hover{ background:var(--btnHover) !important; }
 .stButton > button:active{ transform:scale(.99) !important; }
 
-/* remove labels */
 label, small, .stCaption{display:none !important;}
 
 /* ===== DASHBOARD CARDS ===== */
