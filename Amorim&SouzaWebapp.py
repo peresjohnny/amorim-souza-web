@@ -29,45 +29,42 @@ def format_cpf_digits(d: str) -> str:
 
 if "logged" not in st.session_state:
     st.session_state["logged"] = False
-if "cpf_input" not in st.session_state:
-    st.session_state["cpf_input"] = ""
+if "cpf_visual" not in st.session_state:
+    st.session_state["cpf_visual"] = ""
 if "cpf_digits" not in st.session_state:
     st.session_state["cpf_digits"] = ""
 
 img_b64 = get_base64("1000423374.jpg")
 
-# =========================
-# CSS: topbar FIXO + remove gap do Streamlit + visual “app”
-# =========================
 st.markdown(
     """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
 
 :root{
   --bg: #EFF4F9;
   --blue: #0E4E86;
   --blue2:#0B3E6B;
-  --text:#12202B;
+  --text:#10202B;
   --muted:#607283;
+
   --stroke: rgba(12, 62, 107, .16);
-  --shadowTop: 0 20px 42px rgba(11, 62, 107, 0.22);
+  --shadowTop: 0 18px 36px rgba(11, 62, 107, 0.18);
   --shadowCard: 0 18px 40px rgba(16, 24, 40, 0.10);
   --shadowSoft: 0 10px 24px rgba(16, 24, 40, 0.08);
   --radius: 22px;
 }
 
-/* remove chrome */
 [data-testid="stHeader"], footer, #MainMenu{ display:none !important; }
 
-/* zerar padding/margem “culpados” do gap */
 html, body { margin:0 !important; padding:0 !important; }
+
 .stApp{
   margin:0 !important;
   padding:0 !important;
   font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif !important;
   background:
-    radial-gradient(900px 450px at 50% -160px, rgba(14,78,134,.22), transparent 65%),
+    radial-gradient(900px 450px at 50% -160px, rgba(14,78,134,.20), transparent 65%),
     linear-gradient(180deg, rgba(255,255,255,.40) 0%, rgba(255,255,255,0) 36%),
     var(--bg) !important;
 }
@@ -80,13 +77,13 @@ html, body { margin:0 !important; padding:0 !important; }
   padding-right: 16px !important;
 }
 
-/* isso aqui é o que costuma criar o “gap” acima */
+/* zerar padding que cria “gaps” */
 .block-container{
   padding-top: 0rem !important;
   padding-bottom: max(env(safe-area-inset-bottom), 18px) !important;
 }
 
-/* ===== TOPBAR FIXO COLADO NO TOPO ===== */
+/* Topbar FIXO colado no topo */
 .topbar-fixed{
   position: fixed;
   left: 0;
@@ -96,13 +93,13 @@ html, body { margin:0 !important; padding:0 !important; }
   background: linear-gradient(180deg, var(--blue) 0%, var(--blue2) 100%);
   box-shadow: var(--shadowTop);
   padding-top: env(safe-area-inset-top);
-  height: calc(70px + env(safe-area-inset-top));
+  height: calc(66px + env(safe-area-inset-top));
   display:flex;
   align-items:flex-end;
   justify-content:center;
 }
 .topbar-fixed .title{
-  height: 70px;
+  height: 66px;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -112,30 +109,32 @@ html, body { margin:0 !important; padding:0 !important; }
   font-size: 20px;
   letter-spacing: .2px;
 }
-
-/* Spacer para o conteúdo começar abaixo do topbar */
 .topbar-spacer{
-  height: calc(70px + env(safe-area-inset-top) + 18px);
+  height: calc(66px + env(safe-area-inset-top) + 18px);
 }
 
-/* Central */
-.center{
+/* Centro real (sem depender do Streamlit) */
+.center-wrap{
+  width: 100%;
   display:flex;
   flex-direction:column;
   align-items:center;
 }
 
-/* Logo */
+/* Logo CENTRAL de verdade */
 .logo{
   width: 150px; height: 150px;
   border-radius: 999px;
   object-fit: cover;
   background:#fff;
+  display:block;
+  margin: 0 auto;
   border: 6px solid rgba(255,255,255,.92);
   outline: 4px solid rgba(14,78,134,.18);
   box-shadow: var(--shadowSoft);
 }
 
+/* Título */
 .brand{
   margin-top: 14px;
   font-weight: 900;
@@ -144,7 +143,7 @@ html, body { margin:0 !important; padding:0 !important; }
   text-align:center;
 }
 
-/* Card login */
+/* Card do login */
 .login-card{
   width: 100%;
   max-width: 380px;
@@ -153,14 +152,33 @@ html, body { margin:0 !important; padding:0 !important; }
   border: 1px solid rgba(16,24,40,.06);
   border-radius: var(--radius);
   box-shadow: var(--shadowCard);
-  padding: 18px 16px 16px 16px;
+  padding: 16px;
   backdrop-filter: blur(6px);
 }
 
-/* Input CPF */
+/* ========= FIX DO “INPUT DUPLICADO” =========
+   Zera backgrounds/paddings do wrapper interno do stTextInput
+   e estiliza SOMENTE o input real.
+*/
 div[data-testid="stTextInput"]{
   width: 100% !important;
 }
+div[data-testid="stTextInput"] > div{
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+div[data-testid="stTextInput"] > div > div{
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Input real */
 div[data-testid="stTextInput"] input{
   width: 100% !important;
   height: 56px !important;
@@ -176,6 +194,7 @@ div[data-testid="stTextInput"] input:focus{
   box-shadow: 0 0 0 4px rgba(14,78,134,.12) !important;
 }
 
+/* Texto auxiliar */
 .helper{
   margin-top: 10px;
   color: var(--muted);
@@ -183,14 +202,13 @@ div[data-testid="stTextInput"] input:focus{
   font-weight: 600;
 }
 
-/* Botão LOGIN centralizado */
-.login-btn-wrap{
+/* Botão do FORM (submit) centralizado */
+div[data-testid="stFormSubmitButton"]{
   display:flex;
   justify-content:center;
   margin-top: 14px;
 }
-.login-btn-wrap div[data-testid="stButton"]{ width:auto !important; }
-.login-btn-wrap div[data-testid="stButton"] > button{
+div[data-testid="stFormSubmitButton"] > button{
   width: 190px !important;
   height: 58px !important;
   border-radius: 18px !important;
@@ -202,11 +220,13 @@ div[data-testid="stTextInput"] input:focus{
   text-transform: uppercase !important;
   box-shadow: 0 18px 30px rgba(11, 62, 107, 0.30) !important;
 }
-.login-btn-wrap div[data-testid="stButton"] > button:hover{
+div[data-testid="stFormSubmitButton"] > button:hover{
   filter: brightness(1.03);
   transform: translateY(-1px);
 }
-.login-btn-wrap div[data-testid="stButton"] > button:active{ transform: translateY(0px); }
+div[data-testid="stFormSubmitButton"] > button:active{
+  transform: translateY(0px);
+}
 
 /* Alert mais “card” */
 [data-testid="stAlert"]{
@@ -221,7 +241,7 @@ label{ display:none !important; }
     unsafe_allow_html=True
 )
 
-# Topbar fixo (colado no topo)
+# Topbar fixo
 st.markdown(
     """
 <div class="topbar-fixed">
@@ -236,13 +256,10 @@ st.markdown(
 # LOGIN
 # =========================
 if not st.session_state["logged"]:
-    st.markdown('<div class="center">', unsafe_allow_html=True)
+    st.markdown('<div class="center-wrap">', unsafe_allow_html=True)
 
     if img_b64:
-        st.markdown(
-            f'<img src="data:image/jpeg;base64,{img_b64}" class="logo" />',
-            unsafe_allow_html=True
-        )
+        st.markdown(f'<img src="data:image/jpeg;base64,{img_b64}" class="logo" />', unsafe_allow_html=True)
     else:
         st.markdown(
             """
@@ -254,35 +271,36 @@ if not st.session_state["logged"]:
         )
 
     st.markdown(f'<div class="brand">{APP_NAME}</div>', unsafe_allow_html=True)
-
     st.markdown('<div class="login-card">', unsafe_allow_html=True)
 
-    cpf_visual = st.text_input(
-        "CPF",
-        value=st.session_state["cpf_input"],
-        placeholder="Digite seu CPF",
-        label_visibility="collapsed",
-    )
+    # FORM = render estável no mobile
+    with st.form("login_form", clear_on_submit=False):
+        cpf_visual = st.text_input(
+            "CPF",
+            value=st.session_state["cpf_visual"],
+            placeholder="Digite seu CPF",
+            label_visibility="collapsed",
+        )
 
-    cpf_digits = only_digits(cpf_visual)
-    st.session_state["cpf_digits"] = cpf_digits
-    st.session_state["cpf_input"] = format_cpf_digits(cpf_digits)
+        cpf_digits = only_digits(cpf_visual)
+        st.session_state["cpf_digits"] = cpf_digits
+        st.session_state["cpf_visual"] = format_cpf_digits(cpf_digits)
 
-    st.markdown('<div class="helper">Use apenas números (11 dígitos).</div>', unsafe_allow_html=True)
+        st.markdown('<div class="helper">Use apenas números (11 dígitos).</div>', unsafe_allow_html=True)
 
-    st.markdown('<div class="login-btn-wrap">', unsafe_allow_html=True)
-    if st.button("LOGIN", key="login_btn"):
-        if len(cpf_digits) != 11:
+        submitted = st.form_submit_button("LOGIN")
+
+    if submitted:
+        if len(st.session_state["cpf_digits"]) != 11:
             st.error("CPF inválido. Digite 11 números.")
-        elif cpf_digits == VALID_CPF:
+        elif st.session_state["cpf_digits"] == VALID_CPF:
             st.session_state["logged"] = True
             st.rerun()
         else:
             st.error("CPF não cadastrado na base de dados.")
-    st.markdown("</div>", unsafe_allow_html=True)  # login-btn-wrap
 
     st.markdown("</div>", unsafe_allow_html=True)  # login-card
-    st.markdown("</div>", unsafe_allow_html=True)  # center
+    st.markdown("</div>", unsafe_allow_html=True)  # center-wrap
 
 else:
     st.success("Logado. Próximo passo: dashboard no mesmo padrão visual.")
