@@ -8,9 +8,6 @@ VALID_CPF = "79897789120"  # exemplo
 
 st.set_page_config(page_title=APP_NAME, layout="centered")
 
-# =========================
-# HELPERS
-# =========================
 def get_base64(path: str) -> str:
     with open(path, "rb") as f:
         return base64.b64encode(f.read()).decode()
@@ -33,15 +30,11 @@ if "cpf_visual" not in st.session_state:
 if "cpf_digits" not in st.session_state:
     st.session_state["cpf_digits"] = ""
 
-# =========================
-# LOGO ORIGINAL
-# =========================
+# logo original do seu github
 logo_b64 = get_base64("1000423374.jpg")
 
-# =========================
-# CSS
-# =========================
-st.markdown("""
+st.markdown(
+    """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
 
@@ -71,62 +64,63 @@ html, body{margin:0 !important; padding:0 !important;}
 }
 
 .block-container{
-  padding-top: 40px !important;
-  padding-bottom: 40px !important;
+  padding-top: 0px !important;
+  padding-bottom: 28px !important;
 }
 
-/* Layout central */
+/* ====== FIX DO "PARECE EM BRANCO" NO MOBILE ======
+   Usa viewport dinâmica e coloca conteúdo no topo, sem empurrar pra baixo */
 .page{
-  min-height: 100vh;
+  min-height: 100svh;         /* iOS/Android moderno */
+  min-height: 100dvh;         /* fallback */
   display:flex;
   flex-direction:column;
   align-items:center;
-  justify-content:center;
+  justify-content:flex-start; /* NÃO centraliza vertical */
   text-align:center;
+  padding-top: 40px;          /* ajuste fino */
 }
 
-/* ===== Logo cortada + FADE premium ===== */
+/* ===== Logo cortada (na cintura) + fade ===== */
 .logo-wrapper{
   width: 230px;
-  height: 260px;      /* controla o corte */
+  height: 175px;              /* <<< CORTE REAL: diminui altura */
   overflow: hidden;
-  margin: 0 auto 10px auto;
+  margin: 0 auto 8px auto;
   display: flex;
   justify-content: center;
   position: relative;
 }
 
-/* imagem recortada */
 .logo{
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 20%;
+  object-position: center 5%; /* <<< puxa mais pra cima (cintura corta) */
   display:block;
 }
 
-/* fade inferior (some suave no branco) */
 .logo-wrapper::after{
   content:"";
   position:absolute;
   left:0;
   right:0;
   bottom:0;
-  height: 72px; /* força do fade */
+  height: 70px;
   background: linear-gradient(
     180deg,
     rgba(255,255,255,0) 0%,
-    rgba(255,255,255,0.75) 55%,
+    rgba(255,255,255,0.80) 55%,
     rgba(255,255,255,1) 100%
   );
   pointer-events:none;
 }
 
-/* Nome azul correto */
+/* Nome em azul legível */
 .brand{
-  font-size: 28px;
+  font-size: 30px;
   font-weight: 900;
-  letter-spacing: .08em;
+  letter-spacing: .10em;
   color: var(--blueBrand) !important;
   margin-top: 6px;
 }
@@ -140,7 +134,7 @@ html, body{margin:0 !important; padding:0 !important;}
   margin-bottom: 22px;
 }
 
-/* Remove wrapper duplicado do input */
+/* Remove wrapper fantasma do input */
 div[data-testid="stTextInput"] > div,
 div[data-testid="stTextInput"] > div > div,
 div[data-testid="stTextInput"] > div > div > div{
@@ -157,7 +151,7 @@ div[data-testid="stTextInput"] > div > div > div{
 div[data-testid="stTextInput"] input{
   width:100% !important;
   max-width:360px !important;
-  height:52px !important;
+  height:54px !important;
   border-radius: var(--radius) !important;
   border:1px solid var(--stroke) !important;
   padding:0 16px !important;
@@ -170,15 +164,19 @@ div[data-testid="stTextInput"] input:focus{
   background:#FFF !important;
 }
 
-/* ===== Botão grande + ANIMAÇÃO SUAVE ===== */
+/* ===== BOTÃO: MESMA LARGURA DO INPUT (FULL) =====
+   Não depende do DOM exato do Streamlit: pega o primary por atributo */
 div[data-testid="stFormSubmitButton"]{
   width: 100% !important;
   max-width: 360px !important;
   margin: 16px auto 0 auto !important;
+  display:block !important;
 }
 
-div[data-testid="stFormSubmitButton"] > button{
+/* pega o botão primário mesmo que o Streamlit mude o wrapper */
+button[kind="primary"]{
   width: 100% !important;
+  max-width: 360px !important;
   height: 60px !important;
   border-radius: 16px !important;
   border: none !important;
@@ -195,61 +193,35 @@ div[data-testid="stFormSubmitButton"] > button{
   padding: 0 !important;
 
   transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
-  position: relative;
-  overflow: hidden;
 }
 
-/* brilho sutil passando (premium) */
-div[data-testid="stFormSubmitButton"] > button::before{
-  content:"";
-  position:absolute;
-  top:-30%;
-  left:-60%;
-  width: 50%;
-  height: 160%;
-  background: linear-gradient(120deg, rgba(255,255,255,0), rgba(255,255,255,.22), rgba(255,255,255,0));
-  transform: rotate(18deg);
-  opacity: 0;
-}
-
-div[data-testid="stFormSubmitButton"] > button:hover{
+button[kind="primary"]:hover{
   transform: translateY(-1px);
   box-shadow: var(--shadowBtnHover) !important;
   filter: brightness(1.03);
 }
-div[data-testid="stFormSubmitButton"] > button:hover::before{
-  animation: sheen 0.85s ease;
-  opacity: 1;
-}
 
-div[data-testid="stFormSubmitButton"] > button:active{
+button[kind="primary"]:active{
   transform: translateY(0px) scale(.99);
   filter: brightness(.99);
   box-shadow: var(--shadowBtn) !important;
 }
 
-@keyframes sheen{
-  0%   { left:-60%; opacity:0; }
-  20%  { opacity:1; }
-  100% { left:120%; opacity:0; }
-}
-
 small, .stCaption { display:none !important; }
 label{display:none !important;}
 </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True
+)
 
-# =========================
-# UI
-# =========================
 st.markdown('<div class="page">', unsafe_allow_html=True)
 
 st.markdown(
-    f'''
+    f"""
     <div class="logo-wrapper">
         <img src="data:image/jpeg;base64,{logo_b64}" class="logo">
     </div>
-    ''',
+    """,
     unsafe_allow_html=True
 )
 
