@@ -37,6 +37,8 @@ st.markdown(
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
 
+*{ box-sizing: border-box !important; }
+
 :root{
   --blueBrand: #1E3A8A;
   --blueTop: #2D2BBF;
@@ -47,81 +49,69 @@ st.markdown(
   --shadowBtnHover: 0 24px 54px rgba(0,0,0,.22);
 }
 
-/* Remove chrome do Streamlit */
 [data-testid="stHeader"], footer, #MainMenu{display:none !important;}
 html, body{margin:0 !important; padding:0 !important; height:100% !important;}
-body{overflow:hidden !important;}              /* <<< SEM ROLAGEM */
+body{overflow:hidden !important;}
 
-/* App clean */
-.stApp{
-  background:#FFFFFF !important;
-  font-family: Inter, sans-serif !important;
-}
+.stApp{ background:#FFFFFF !important; font-family: Inter, sans-serif !important; }
+.block-container{ padding:0 !important; margin:0 !important; }
+[data-testid="stMainViewContainer"]{ padding:0 !important; margin:0 !important; }
 
-/* Mata paddings que criam “buraco” */
-.block-container{
-  padding:0 !important;
-  margin:0 !important;
-}
-
-/* Container principal do Streamlit (garante centralização) */
-[data-testid="stMainViewContainer"]{
-  padding:0 !important;
-  margin:0 !important;
-}
-
-/* ====== SOLUÇÃO DEFINITIVA: tela fixa full-screen ======
-   Mesmo que o Streamlit injete margens, isso fica por cima e centraliza tudo.
-*/
 #hero{
-  position: fixed;
-  inset: 0;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  background:#FFFFFF;
-  overflow:hidden;                 /* sem scroll */
-  padding: 24px 18px;
-  text-align:center;
+  position: fixed !important;
+  inset: 0 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  background:#FFFFFF !important;
+  overflow:hidden !important;
+  padding: 22px 18px !important;
+  text-align:center !important;
 }
 
-/* Largura “app-like” */
+#hero .stMarkdown,
+#hero [data-testid="stMarkdown"]{
+  width:100% !important;
+  display:flex !important;
+  justify-content:center !important;
+}
+
 .hero-inner{
-  width:100%;
-  max-width: 380px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
+  width:100% !important;
+  max-width: 380px !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  margin: 0 auto !important;
 }
 
-/* ===== LOGO: maior + crop real ===== */
+/* ===== LOGO: ajustada pra NÃO cortar a mão ===== */
 .logo-wrapper{
-  width: 300px;          /* <<< maior */
-  max-width: 78vw;
-  height: 230px;         /* “cintura” */
+  width: 320px;
+  max-width: 82vw;
+  height: 260px;              /* <<< aumentei (antes 240) */
   overflow:hidden;
   position:relative;
   display:flex;
   align-items:flex-start;
   justify-content:center;
-  margin-bottom: 10px;
+  margin: 0 auto 10px auto;
 }
 
-/* zoom real + deslocamento */
 .logo{
-  width: 185%;           /* <<< zoom forte (porque seu jpg tem ar branco) */
+  width: 190%;
   height: auto;
-  transform: translateY(-28px); /* <<< sobe pra cortar a cintura */
+  transform: translateY(-14px); /* <<< desci (antes -30) = preserva mão */
   display:block;
 }
 
-/* fade premium */
 .logo-wrapper::after{
   content:"";
   position:absolute;
   left:0; right:0; bottom:0;
-  height: 76px;
+  height: 86px;               /* ligeiramente maior pro fade acompanhar */
   background: linear-gradient(
     180deg,
     rgba(255,255,255,0) 0%,
@@ -131,13 +121,14 @@ body{overflow:hidden !important;}              /* <<< SEM ROLAGEM */
   pointer-events:none;
 }
 
-/* Textos */
 .brand{
   font-size: 32px;
   font-weight: 900;
   letter-spacing: .10em;
-  color: var(--blueBrand);
+  color: var(--blueBrand) !important;
   margin: 2px 0 2px 0;
+  text-align:center !important;
+  width:100%;
 }
 
 .subtitle{
@@ -146,17 +137,29 @@ body{overflow:hidden !important;}              /* <<< SEM ROLAGEM */
   font-weight: 800;
   color: rgba(30, 58, 138, .55);
   margin: 0 0 18px 0;
+  text-align:center !important;
+  width:100%;
 }
 
-/* ===== INPUT E BOTÃO: mesma largura, centralizados ===== */
 .form-wrap{
-  width: 100%;
-  max-width: 360px;
-  margin: 0 auto;
+  width:100% !important;
+  max-width: 360px !important;
+  margin: 0 auto !important;
+  display:block !important;
 }
 
-/* tira wrappers do input */
-div[data-testid="stTextInput"]{ width:100% !important; }
+div[data-testid="stForm"]{
+  width:100% !important;
+  display:block !important;
+  margin: 0 auto !important;
+}
+
+div[data-testid="stTextInput"]{
+  width:100% !important;
+  max-width: 360px !important;
+  margin: 0 auto !important;
+}
+
 div[data-testid="stTextInput"] > div,
 div[data-testid="stTextInput"] > div > div,
 div[data-testid="stTextInput"] > div > div > div{
@@ -167,7 +170,6 @@ div[data-testid="stTextInput"] > div > div > div{
   margin:0 !important;
 }
 
-/* input */
 div[data-testid="stTextInput"] input{
   width:100% !important;
   height:56px !important;
@@ -176,6 +178,7 @@ div[data-testid="stTextInput"] input{
   padding:0 16px !important;
   font-size:15px !important;
   background:#F9FAFB !important;
+  text-align:left !important;
 }
 div[data-testid="stTextInput"] input:focus{
   border:1px solid rgba(45,43,191,.45) !important;
@@ -183,19 +186,32 @@ div[data-testid="stTextInput"] input:focus{
   background:#FFF !important;
 }
 
-/* submit wrapper */
 div[data-testid="stFormSubmitButton"]{
   width:100% !important;
-  margin-top: 14px !important;
+  max-width: 360px !important;
+  margin: 14px auto 0 auto !important;
+  display:flex !important;
+  justify-content:center !important;
 }
 
-/* ===== botão: força full width em QUALQUER caso ===== */
+div[data-testid="stFormSubmitButton"] > div{
+  width:100% !important;
+  display:flex !important;
+}
+div[data-testid="stFormSubmitButton"] .stButton{
+  width:100% !important;
+  display:flex !important;
+}
+div[data-testid="stFormSubmitButton"] .stButton > button{
+  flex: 1 1 auto !important;
+}
+
 div[data-testid="stFormSubmitButton"] button,
 button[kind="primary"],
 .stButton > button{
   width:100% !important;
   min-width:100% !important;
-  height:64px !important;                /* <<< grande como no mock */
+  height:64px !important;
   border-radius: 18px !important;
   border:none !important;
   background: linear-gradient(180deg, var(--blueTop), var(--blueBot)) !important;
@@ -263,7 +279,6 @@ label{display:none !important;}
     unsafe_allow_html=True
 )
 
-# ====== UI em camada fixa (hero) ======
 st.markdown('<div id="hero"><div class="hero-inner">', unsafe_allow_html=True)
 
 st.markdown(
@@ -293,9 +308,8 @@ with st.form("cpf_form", clear_on_submit=False):
 
     submitted = st.form_submit_button("Verificar CPF")
 
-st.markdown('</div>', unsafe_allow_html=True)  # form-wrap
+st.markdown('</div>', unsafe_allow_html=True)
 
-# mensagens abaixo do form (ainda dentro do hero)
 if submitted:
     if len(st.session_state["cpf_digits"]) != 11:
         st.error("CPF inválido.")
@@ -304,4 +318,4 @@ if submitted:
     else:
         st.error("CPF não cadastrado.")
 
-st.markdown('</div></div>', unsafe_allow_html=True)  # hero-inner + hero
+st.markdown('</div></div>', unsafe_allow_html=True)
