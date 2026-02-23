@@ -1,8 +1,6 @@
 import re
 import base64
 import streamlit as st
-import streamlit.components.v1 as components
-from textwrap import dedent
 
 APP_NAME = "AMORIM & SOUZA"
 SUBTITLE = "ADVOCACIA"
@@ -22,7 +20,8 @@ st.set_page_config(page_title=APP_NAME, layout="centered")
 
 
 def md(html: str):
-    st.markdown(dedent(html).strip("\n"), unsafe_allow_html=True)
+    # NÃO usa dedent aqui, pra não dar “vazamento” estranho no mobile
+    st.markdown(html, unsafe_allow_html=True)
 
 
 def get_base64(path: str) -> str:
@@ -146,7 +145,7 @@ html, body{ margin:0 !important; padding:0 !important; height:100% !important; }
   -webkit-overflow-scrolling:touch;
 }
 
-/* TOPBAR fixa no topo */
+/* TOPBAR fixa no topo (fora de iframe) */
 .topbar{
   position:fixed;
   top:0; left:0; right:0;
@@ -190,7 +189,6 @@ html, body{ margin:0 !important; padding:0 !important; height:100% !important; }
   color: rgba(255,255,255,.95) !important;
 }
 
-/* back icon */
 .top-btn{
   width:38px;
   height:38px;
@@ -203,7 +201,6 @@ html, body{ margin:0 !important; padding:0 !important; height:100% !important; }
 }
 .top-btn svg{ width:18px; height:18px; }
 
-/* SAIR minimalista (só texto branco) */
 .exit-link{
   font-size:12px;
   font-weight:900;
@@ -211,6 +208,7 @@ html, body{ margin:0 !important; padding:0 !important; height:100% !important; }
   padding: 6px 2px;
   background: transparent;
   border: none;
+  color: rgba(255,255,255,.95) !important;
 }
 
 /* Conteúdo abaixo da topbar */
@@ -500,23 +498,20 @@ def topbar(title: str, show_back: bool, back_to: str, show_exit: bool):
     back_href = f'?go={back_to}&token={token}' if show_back else ""
     exit_href = '?go=logout' if show_exit else ""
 
-    # Renderiza fora do markdown pra não “vazar” como texto
-    html = f"""
+    left = f'<a class="top-btn" href="{back_href}" target="_self" rel="noopener">{BACK_SVG}</a>' if show_back else ""
+    right = f'<a class="exit-link" href="{exit_href}" target="_self" rel="noopener">SAIR</a>' if show_exit else ""
+
+    md(
+        f"""
 <div class="topbar">
   <div class="topbar-inner">
-    <div class="top-left">
-      {"<a class='top-btn' href='"+back_href+"' target='_self' rel='noopener'>"+BACK_SVG+"</a>" if show_back else ""}
-    </div>
-
+    <div class="top-left">{left}</div>
     <div class="topbar-title">{title}</div>
-
-    <div class="top-right">
-      {"<a class='exit-link' href='"+exit_href+"' target='_self' rel='noopener'>SAIR</a>" if show_exit else ""}
-    </div>
+    <div class="top-right">{right}</div>
   </div>
 </div>
 """
-    components.html(html, height=78, scrolling=False)
+    )
 
 
 def view_login():
