@@ -1,6 +1,7 @@
 import re
 import base64
 import streamlit as st
+from textwrap import dedent
 
 APP_NAME = "AMORIM & SOUZA"
 SUBTITLE = "ADVOCACIA"
@@ -17,6 +18,11 @@ PROCESSOS = [
 ]
 
 st.set_page_config(page_title=APP_NAME, layout="centered")
+
+
+def md(html: str):
+    """Renderiza HTML sem vazar como code block (remove indentação do markdown)."""
+    st.markdown(dedent(html).strip("\n"), unsafe_allow_html=True)
 
 
 def get_base64(path: str) -> str:
@@ -84,7 +90,7 @@ BACK_SVG = """
 </svg>
 """
 
-st.markdown(
+md(
     """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
@@ -422,8 +428,7 @@ div[data-testid="stTextInput"] input{
 }
 .stButton > button:hover{ background: var(--blue2) !important; }
 </style>
-""",
-    unsafe_allow_html=True,
+"""
 )
 
 
@@ -454,36 +459,35 @@ def topbar(title: str, show_back: bool, back_to: str, show_exit: bool):
     back_html = ""
     exit_html = ""
     if show_back:
-        back_html = f'<a class="icon-btn" href="?go={back_to}">{BACK_SVG}</a>'
+        # target="_self" para NÃO abrir nova aba no mobile
+        back_html = f'<a class="icon-btn" href="?go={back_to}" target="_self" rel="noopener">{BACK_SVG}</a>'
     if show_exit:
-        exit_html = '<a class="exit-link" href="?go=logout">SAIR</a>'
+        exit_html = '<a class="exit-link" href="?go=logout" target="_self" rel="noopener">SAIR</a>'
 
-    st.markdown(
+    md(
         f"""
-        <div class="topbar">
-          <div class="topbar-inner">
-            {back_html}
-            <div>{title}</div>
-            {exit_html}
-          </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
+<div class="topbar">
+  <div class="topbar-inner">
+    {back_html}
+    <div>{title}</div>
+    {exit_html}
+  </div>
+</div>
+"""
     )
 
 
 def view_login():
-    st.markdown('<div id="wrap"><div class="inner">', unsafe_allow_html=True)
+    md('<div id="wrap"><div class="inner">')
 
-    st.markdown(
+    md(
         f"""
-        <div class="logo-wrap">
-          <img src="data:image/jpeg;base64,{logo_b64}" class="logo-img" />
-        </div>
-        <div class="brand">{APP_NAME}</div>
-        <div class="subtitle">{SUBTITLE}</div>
-        """,
-        unsafe_allow_html=True,
+<div class="logo-wrap">
+  <img src="data:image/jpeg;base64,{logo_b64}" class="logo-img" />
+</div>
+<div class="brand">{APP_NAME}</div>
+<div class="subtitle">{SUBTITLE}</div>
+"""
     )
 
     with st.form("login_form", clear_on_submit=False):
@@ -508,81 +512,79 @@ def view_login():
             else:
                 st.error("CPF não cadastrado.")
 
-    st.markdown("</div></div>", unsafe_allow_html=True)
-    st.markdown('<div class="copy">© AMR SOFTWARES</div>', unsafe_allow_html=True)
+    md("</div></div>")
+    md('<div class="copy">© AMR SOFTWARES</div>')
 
 
 def view_dashboard():
-    st.markdown('<div id="wrap">', unsafe_allow_html=True)
+    md('<div id="wrap">')
     topbar("Dashboard", show_back=False, back_to="dashboard", show_exit=True)
-    st.markdown('<div class="inner">', unsafe_allow_html=True)
+    md('<div class="inner">')
 
-    st.markdown(
+    md(
         f"""
-        <div class="user-card">
-          <div class="avatar">{ICON_USER}</div>
-          <div>
-            <div class="user-title">Olá, {CLIENT_NAME}</div>
-            <div class="user-sub">Selecione uma opção</div>
-          </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
+<div class="user-card">
+  <div class="avatar">{ICON_USER}</div>
+  <div>
+    <div class="user-title">Olá, {CLIENT_NAME}</div>
+    <div class="user-sub">Selecione uma opção</div>
+  </div>
+</div>
+"""
     )
 
-    st.markdown(
+    # target="_self" evita abrir outra aba no mobile
+    md(
         f"""
-        <div class="grid">
-          <a class="cardlink" href="?go=processos">
-            <div class="cardicon">{ICON_DOC}</div>
-            <div class="cardtitle">PROCESSOS</div>
-            <div class="cardsub">Consultar andamento</div>
-          </a>
+<div class="grid">
+  <a class="cardlink" href="?go=processos" target="_self" rel="noopener">
+    <div class="cardicon">{ICON_DOC}</div>
+    <div class="cardtitle">PROCESSOS</div>
+    <div class="cardsub">Consultar andamento</div>
+  </a>
 
-          <a class="cardlink" href="?go=acordos">
-            <div class="cardicon">{ICON_HANDSHAKE}</div>
-            <div class="cardtitle">ACORDOS</div>
-            <div class="cardsub">Ver propostas</div>
-          </a>
-        </div>
-        """,
-        unsafe_allow_html=True,
+  <a class="cardlink" href="?go=acordos" target="_self" rel="noopener">
+    <div class="cardicon">{ICON_HANDSHAKE}</div>
+    <div class="cardtitle">ACORDOS</div>
+    <div class="cardsub">Ver propostas</div>
+  </a>
+</div>
+"""
     )
 
-    st.markdown("</div></div>", unsafe_allow_html=True)
-    st.markdown('<div class="copy">© AMR SOFTWARES</div>', unsafe_allow_html=True)
+    md("</div></div>")
+    md('<div class="copy">© AMR SOFTWARES</div>')
 
 
 def view_processos():
-    st.markdown('<div id="wrap">', unsafe_allow_html=True)
+    md('<div id="wrap">')
     topbar("Processos", show_back=True, back_to="dashboard", show_exit=True)
-    st.markdown('<div class="inner">', unsafe_allow_html=True)
+    md('<div class="inner">')
 
     for p in PROCESSOS:
-        st.markdown(
+        md(
             f"""
-            <div class="proc-card">
-              <div class="proc-tag">AGUARDANDO ATUALIZAÇÃO</div>
-              <div class="proc-label">Número do Processo</div>
-              <div class="proc-number">{p}</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
+<div class="proc-card">
+  <div class="proc-tag">AGUARDANDO ATUALIZAÇÃO</div>
+  <div class="proc-label">Número do Processo</div>
+  <div class="proc-number">{p}</div>
+</div>
+"""
         )
 
-    st.markdown("</div></div>", unsafe_allow_html=True)
-    st.markdown('<div class="copy">© AMR SOFTWARES</div>', unsafe_allow_html=True)
+    md("</div></div>")
+    md('<div class="copy">© AMR SOFTWARES</div>')
 
 
 def view_acordos():
-    st.markdown('<div id="wrap">', unsafe_allow_html=True)
+    md('<div id="wrap">')
     topbar("Acordos", show_back=True, back_to="dashboard", show_exit=True)
-    st.markdown('<div class="inner">', unsafe_allow_html=True)
+    md('<div class="inner">')
 
     st.info("Em atualização")
 
-    st.markdown("</div></div>", unsafe_allow_html=True)
-    st.markdown('<div class="copy">© AMR SOFTWARES</div>', unsafe_allow_html=True)
+    md("</div></div>")
+    md('<div class="copy">© AMR SOFTWARES</div>')
 
 
 sync_route()
