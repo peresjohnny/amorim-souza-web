@@ -52,6 +52,44 @@ st.session_state.setdefault("cpf_digits", "")
 
 logo_b64 = get_base64(LOGO_FILE)
 
+ICON_USER = """
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+     xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <path d="M12 12c2.761 0 5-2.463 5-5.5S14.761 1 12 1 7 3.463 7 6.5 9.239 12 12 12Z"
+        fill="currentColor" opacity="0.92"/>
+  <path d="M3 22c0-4.418 4.03-8 9-8s9 3.582 9 8"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+</svg>
+"""
+
+ICON_DOC = """
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+     xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <path d="M7 3h7l3 3v15a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"
+        stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M14 3v4a2 2 0 0 0 2 2h4" stroke="currentColor" stroke-width="2"/>
+  <path d="M8 12h8M8 16h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+</svg>
+"""
+
+ICON_HANDSHAKE = """
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+     xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <path d="M7 13l3.2 3.2a3 3 0 0 0 4.2 0L17 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  <path d="M9 11l1.7-1.7a3 3 0 0 1 4.2 0L16 10.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  <path d="M2 12l4-4 5 5-4 4-5-5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M22 12l-4-4-5 5 4 4 5-5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+</svg>
+"""
+
+BACK_SVG = """
+<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"
+     xmlns="http://www.w3.org/2000/svg">
+  <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.4"
+        stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+"""
+
 # ===== CSS =====
 md(
     """
@@ -80,7 +118,6 @@ html, body{ margin:0 !important; padding:0 !important; height:100% !important; }
 .block-container{ padding:0 !important; margin:0 !important; }
 [data-testid="stMainViewContainer"]{ padding:0 !important; margin:0 !important; }
 
-/* container full-screen */
 #wrap{
   position:fixed;
   inset:0;
@@ -89,13 +126,11 @@ html, body{ margin:0 !important; padding:0 !important; height:100% !important; }
   -webkit-overflow-scrolling:touch;
 }
 
-/* Topbar fixa (resolve a faixa branca em cima) */
+/* TOPBAR fixa e colada no topo (sem faixa branca) */
 .topbar{
   position:fixed;
-  top:0;
-  left:0;
-  right:0;
-  z-index:9999;
+  top:0; left:0; right:0;
+  z-index:10000;
   height: calc(var(--headerH) + env(safe-area-inset-top));
   padding-top: env(safe-area-inset-top);
   display:flex;
@@ -107,46 +142,45 @@ html, body{ margin:0 !important; padding:0 !important; height:100% !important; }
   letter-spacing:.06em;
   box-shadow: 0 10px 24px rgba(0,0,0,.10);
 }
-
 .topbar-inner{
   width:420px;
   max-width:94vw;
   padding: 0 var(--pad);
+  height: var(--headerH);
   display:flex;
   align-items:center;
   justify-content:center;
   position:relative;
-  height: var(--headerH);
 }
+.topbar-title{ font-weight:900; }
 
-.topbar-title{
-  font-weight:900;
+/* ações na topbar */
+.top-actions{
+  position:fixed;
+  top: env(safe-area-inset-top);
+  left:0; right:0;
+  z-index:10001;
+  pointer-events:none; /* libera clique só nos botões */
 }
-
-.topbar-actions{
-  position:absolute;
-  right: var(--pad);
-  top:50%;
-  transform: translateY(-50%);
-}
-
-/* Conteúdo começa abaixo da topbar */
-.inner{
+.top-actions-inner{
   width:420px;
   max-width:94vw;
   margin:0 auto;
-  padding: calc(var(--headerH) + env(safe-area-inset-top) + 14px) var(--pad) 72px var(--pad);
-  text-align:center;
+  padding: 8px var(--pad);
+  height: var(--headerH);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  pointer-events:none;
+}
+.top-actions-inner .slot{
+  pointer-events:auto;
+  width:auto;
 }
 
-label, small, .stCaption{ display:none !important; }
-
-/* Botão SAIR no topo: pequeno e alinhado */
-.topbar-actions .stButton{
-  width:auto !important;
-  margin:0 !important;
-}
-.topbar-actions .stButton > button{
+/* botão pequeno topo */
+.top-actions .stButton{ width:auto !important; margin:0 !important; }
+.top-actions .stButton > button{
   width:auto !important;
   height:38px !important;
   min-height:38px !important;
@@ -158,14 +192,24 @@ label, small, .stCaption{ display:none !important; }
   font-weight: 900 !important;
   font-size: 12px !important;
   letter-spacing: .10em !important;
-  box-shadow: none !important;
-  text-align:center !important;
+  box-shadow:none !important;
 }
-.topbar-actions .stButton > button:hover{
+.top-actions .stButton > button:hover{
   background: rgba(255,255,255,.18) !important;
 }
 
-/* User card */
+/* conteúdo abaixo da topbar */
+.inner{
+  width:420px;
+  max-width:94vw;
+  margin:0 auto;
+  padding: calc(var(--headerH) + env(safe-area-inset-top) + 14px) var(--pad) 72px var(--pad);
+  text-align:center;
+}
+
+label, small, .stCaption{ display:none !important; }
+
+/* cartão usuário */
 .user-card{
   width:100%;
   background:#fff;
@@ -190,7 +234,6 @@ label, small, .stCaption{ display:none !important; }
   align-items:center;
   justify-content:center;
   color: var(--blue);
-  font-size:20px;
 }
 .user-title{
   font-size:20px;
@@ -206,41 +249,74 @@ label, small, .stCaption{ display:none !important; }
   color: var(--sub);
 }
 
-/* Cards = botões (sem hyperlink, sem “ponto preto”) */
-.card-grid{ width:100%; margin-top: 8px; }
-.card-grid .stButton{ width:100% !important; margin:0 !important; }
-.card-grid .stButton > button{
+/* grid cards */
+.grid{
+  width:100%;
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+/* card visual */
+.card{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:10px;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  background:#fff;
+  min-height: 132px;
+  text-align:left;
+}
+.card:active{ transform: translateY(0px); }
+.cardicon{
+  width:44px;
+  height:44px;
+  border-radius:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: rgba(45,43,191,.10);
+  border:1px solid rgba(45,43,191,.18);
+  color: var(--blue);
+}
+.cardtitle{
+  font-size:14px;
+  font-weight:900;
+  letter-spacing:.08em;
+  color: var(--brand);
+}
+.cardsub{
+  font-size:12px;
+  font-weight:700;
+  color: rgba(17,24,39,.55);
+  margin-top:-2px;
+}
+
+/* botão overlay transparente (pra clicar no card inteiro) */
+.card .stButton{ position:absolute; inset:0; width:100% !important; height:100% !important; margin:0 !important; }
+.card .stButton > button{
+  position:absolute !important;
+  inset:0 !important;
   width:100% !important;
-  min-height: 132px !important;
-  border-radius: 18px !important;
-  border: 1px solid var(--border) !important;
-  background:#fff !important;
-  color: #111827 !important;
-  box-shadow: var(--shadow) !important;
-  padding: 16px !important;
-  text-align:left !important;
+  height:100% !important;
+  border:none !important;
+  background: transparent !important;
+  color: transparent !important;
+  box-shadow:none !important;
+  padding:0 !important;
+  margin:0 !important;
+  border-radius:18px !important;
+}
+.card .stButton > button:focus{ outline:none !important; box-shadow:none !important; }
+.card .stButton > button:hover{ background: rgba(30,58,138,.03) !important; }
 
-  display:flex !important;
-  flex-direction:column !important;
-  align-items:flex-start !important;
-  justify-content:flex-start !important;
-
-  white-space: pre-line !important; /* permite \n */
-  font-weight: 900 !important;
-  font-size: 14px !important;
-}
-.card-grid .stButton > button:hover{
-  border-color: rgba(30,58,138,.22) !important;
-}
-.card-grid .stButton > button:focus{
-  outline: none !important;
-  box-shadow: var(--shadow) !important;
-}
-.card-grid .stButton > button:active{
-  transform: translateY(0px) !important;
-}
-
-/* Processos cards */
+/* processos cards */
 .proc-card{
   width:100%;
   border-radius:18px;
@@ -272,6 +348,18 @@ label, small, .stCaption{ display:none !important; }
   color:#111827;
   font-weight:900;
   margin-top:6px;
+}
+
+.copy{
+  position:fixed;
+  bottom:14px;
+  left:0; right:0;
+  text-align:center;
+  color: rgba(30,58,138,.45);
+  font-size:11px;
+  letter-spacing:.14em;
+  font-weight:800;
+  pointer-events:none;
 }
 
 /* LOGIN */
@@ -323,8 +411,6 @@ label, small, .stCaption{ display:none !important; }
   line-height: 1;
   letter-spacing: .25em;
 }
-
-/* TextInput */
 div[data-testid="stTextInput"]{ width: 100% !important; }
 div[data-testid="stTextInput"] [data-baseweb="base-input"]{
   border: none !important;
@@ -351,11 +437,8 @@ div[data-testid="stTextInput"] input{
   font-size: 15px !important;
   color:#111827 !important;
 }
-
-/* Submit do form (azul) */
-div[data-testid="stFormSubmitButton"] .stButton > button,
 div[data-testid="stFormSubmitButton"] button{
-  min-height: 54px !important;
+  width:100% !important;
   height: 54px !important;
   border-radius: 18px !important;
   border: none !important;
@@ -364,25 +447,8 @@ div[data-testid="stFormSubmitButton"] button{
   font-weight: 900 !important;
   font-size: 16px !important;
   box-shadow: 0 10px 26px rgba(0,0,0,.08) !important;
-  align-items:center !important;
-  justify-content:center !important;
-  text-align:center !important;
 }
-div[data-testid="stFormSubmitButton"] button:hover{
-  background: var(--blue2) !important;
-}
-
-.copy{
-  position:fixed;
-  bottom:14px;
-  left:0; right:0;
-  text-align:center;
-  color: rgba(30,58,138,.45);
-  font-size:11px;
-  letter-spacing:.14em;
-  font-weight:800;
-  pointer-events:none;
-}
+div[data-testid="stFormSubmitButton"] button:hover{ background: var(--blue2) !important; }
 </style>
 """
 )
@@ -401,7 +467,7 @@ def logout():
     st.rerun()
 
 
-def topbar(title: str, show_exit: bool):
+def topbar(title: str, show_back: bool, show_exit: bool):
     md(
         f"""
 <div class="topbar">
@@ -411,12 +477,34 @@ def topbar(title: str, show_exit: bool):
 </div>
 """
     )
+
+    md('<div class="top-actions"><div class="top-actions-inner">')
+
+    # slot esquerdo
+    md('<div class="slot">')
+    if show_back:
+        if st.button(" ", key=f"back_{title}"):
+            goto("dashboard")
+        # coloca o SVG por cima do botão (visual)
+        md(
+            f"""
+<div style="position:relative; margin-top:-38px; width:38px; height:38px; border-radius:12px;
+            border:1px solid rgba(255,255,255,.22); background:rgba(255,255,255,.12);
+            display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,.95);">
+  {BACK_SVG}
+</div>
+"""
+        )
+    md("</div>")
+
+    # slot direito
+    md('<div class="slot">')
     if show_exit:
-        # Renderiza o botão no canto direito por cima da barra
-        md('<div class="topbar"><div class="topbar-inner"><div class="topbar-actions">')
         if st.button("SAIR", key=f"exit_{title}"):
             logout()
-        md("</div></div></div>")
+    md("</div>")
+
+    md("</div></div>")
 
 
 def view_login():
@@ -460,13 +548,13 @@ def view_login():
 
 def view_dashboard():
     md('<div id="wrap">')
-    topbar("Dashboard", show_exit=True)
+    topbar("Dashboard", show_back=False, show_exit=True)
     md('<div class="inner">')
 
     md(
         f"""
 <div class="user-card">
-  <div class="avatar">👤</div>
+  <div class="avatar">{ICON_USER}</div>
   <div>
     <div class="user-title">Olá, {CLIENT_NAME}</div>
     <div class="user-sub">Selecione uma opção</div>
@@ -475,33 +563,43 @@ def view_dashboard():
 """
     )
 
-    md('<div class="card-grid">')
-    c1, c2 = st.columns(2, gap="large")
+    md('<div class="grid">')
 
-    with c1:
-        # Botão-card: 2 linhas sem hyperlink
-        if st.button("📄  PROCESSOS\nConsultar andamento", key="go_processos"):
-            goto("processos")
-
-    with c2:
-        if st.button("🤝  ACORDOS\nVer propostas", key="go_acordos"):
-            goto("acordos")
+    # CARD PROCESSOS
+    md(
+        f"""
+<div class="card">
+  <div class="cardicon">{ICON_DOC}</div>
+  <div class="cardtitle">PROCESSOS</div>
+  <div class="cardsub">Consultar andamento</div>
+"""
+    )
+    if st.button("\u200b", key="go_processos"):
+        goto("processos")
     md("</div>")
 
+    # CARD ACORDOS
+    md(
+        f"""
+<div class="card">
+  <div class="cardicon">{ICON_HANDSHAKE}</div>
+  <div class="cardtitle">ACORDOS</div>
+  <div class="cardsub">Ver propostas</div>
+"""
+    )
+    if st.button("\u200b", key="go_acordos"):
+        goto("acordos")
+    md("</div>")
+
+    md("</div>")  # grid
     md("</div></div>")
     md('<div class="copy">© AMR SOFTWARES</div>')
 
 
 def view_processos():
     md('<div id="wrap">')
-    topbar("Processos", show_exit=True)
+    topbar("Processos", show_back=True, show_exit=True)
     md('<div class="inner">')
-
-    # Voltar como botão normal (sem hack)
-    if st.button("◀  Voltar", key="back_proc"):
-        goto("dashboard")
-
-    md("<div style='height:10px'></div>")
 
     for p in PROCESSOS:
         md(
@@ -520,13 +618,9 @@ def view_processos():
 
 def view_acordos():
     md('<div id="wrap">')
-    topbar("Acordos", show_exit=True)
+    topbar("Acordos", show_back=True, show_exit=True)
     md('<div class="inner">')
 
-    if st.button("◀  Voltar", key="back_acord"):
-        goto("dashboard")
-
-    md("<div style='height:10px'></div>")
     st.info("Em atualização")
 
     md("</div></div>")
