@@ -44,11 +44,32 @@ def format_cpf(d: str) -> str:
     return f"{d[:3]}.{d[3:6]}.{d[6:9]}-{d[9:]}"
 
 
+def make_token(cpf_digits: str) -> str:
+    # Simples e suficiente pro seu caso (não é “segurança bancária”).
+    # Mantém o usuário logado mesmo se o Streamlit recarregar.
+    raw = f"ok:{cpf_digits}"
+    return base64.urlsafe_b64encode(raw.encode("utf-8")).decode("utf-8").rstrip("=")
+
+
+def parse_token(token: str) -> str:
+    if not token:
+        return ""
+    try:
+        padded = token + "=" * (-len(token) % 4)
+        raw = base64.urlsafe_b64decode(padded.encode("utf-8")).decode("utf-8")
+        if raw.startswith("ok:"):
+            return only_digits(raw[3:])[:11]
+        return ""
+    except Exception:
+        return ""
+
+
 # ===== State =====
 st.session_state.setdefault("logado", False)
 st.session_state.setdefault("tela", "login")  # login | dashboard | processos | acordos
 st.session_state.setdefault("cpf_visual", "")
 st.session_state.setdefault("cpf_digits", "")
+st.session_state.setdefault("token", "")
 
 logo_b64 = get_base64(LOGO_FILE)
 
@@ -126,7 +147,7 @@ html, body{ margin:0 !important; padding:0 !important; height:100% !important; }
   -webkit-overflow-scrolling:touch;
 }
 
-/* TOPBAR fixa e colada no topo (sem faixa branca) */
+/* TOPBAR fixa no topo, sem branco */
 .topbar{
   position:fixed;
   top:0; left:0; right:0;
@@ -154,51 +175,45 @@ html, body{ margin:0 !important; padding:0 !important; height:100% !important; }
 }
 .topbar-title{ font-weight:900; }
 
-/* ações na topbar */
-.top-actions{
-  position:fixed;
-  top: env(safe-area-inset-top);
-  left:0; right:0;
-  z-index:10001;
-  pointer-events:none; /* libera clique só nos botões */
-}
-.top-actions-inner{
-  width:420px;
-  max-width:94vw;
-  margin:0 auto;
-  padding: 8px var(--pad);
-  height: var(--headerH);
+.top-left, .top-right{
+  position:absolute;
+  top:50%;
+  transform: translateY(-50%);
   display:flex;
   align-items:center;
-  justify-content:space-between;
-  pointer-events:none;
+  gap:10px;
 }
-.top-actions-inner .slot{
-  pointer-events:auto;
-  width:auto;
-}
+.top-left{ left: var(--pad); }
+.top-right{ right: var(--pad); }
 
-/* botão pequeno topo */
-.top-actions .stButton{ width:auto !important; margin:0 !important; }
-.top-actions .stButton > button{
-  width:auto !important;
-  height:38px !important;
-  min-height:38px !important;
-  padding: 0 12px !important;
-  border-radius: 12px !important;
-  border: 1px solid rgba(255,255,255,.20) !important;
-  background: rgba(255,255,255,.12) !important;
+/* Links minimalistas na topbar */
+.topbar a{
+  text-decoration:none !important;
   color: rgba(255,255,255,.95) !important;
-  font-weight: 900 !important;
-  font-size: 12px !important;
-  letter-spacing: .10em !important;
-  box-shadow:none !important;
 }
-.top-actions .stButton > button:hover{
-  background: rgba(255,255,255,.18) !important;
+.top-btn{
+  width:38px;
+  height:38px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.22);
+  background: rgba(255,255,255,.12);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.top-btn svg{ width:18px; height:18px; }
+
+.exit-link{
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.10em;
+  padding: 10px 10px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.18);
 }
 
-/* conteúdo abaixo da topbar */
+/* Conteúdo abaixo da topbar */
 .inner{
   width:420px;
   max-width:94vw;
@@ -209,7 +224,7 @@ html, body{ margin:0 !important; padding:0 !important; height:100% !important; }
 
 label, small, .stCaption{ display:none !important; }
 
-/* cartão usuário */
+/* user card */
 .user-card{
   width:100%;
   background:#fff;
@@ -258,9 +273,8 @@ label, small, .stCaption{ display:none !important; }
   margin-top: 8px;
 }
 
-/* card visual */
-.card{
-  position:relative;
+/* card agora é <a> e fica perfeito */
+.cardlink{
   display:flex;
   flex-direction:column;
   align-items:flex-start;
@@ -270,10 +284,15 @@ label, small, .stCaption{ display:none !important; }
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
   background:#fff;
+  color: inherit;
+  text-decoration:none !important;
   min-height: 132px;
   text-align:left;
 }
-.card:active{ transform: translateY(0px); }
+.cardlink:hover{
+  border-color: rgba(30,58,138,.22);
+  background: rgba(30,58,138,.02);
+}
 .cardicon{
   width:44px;
   height:44px;
@@ -298,25 +317,7 @@ label, small, .stCaption{ display:none !important; }
   margin-top:-2px;
 }
 
-/* botão overlay transparente (pra clicar no card inteiro) */
-.card .stButton{ position:absolute; inset:0; width:100% !important; height:100% !important; margin:0 !important; }
-.card .stButton > button{
-  position:absolute !important;
-  inset:0 !important;
-  width:100% !important;
-  height:100% !important;
-  border:none !important;
-  background: transparent !important;
-  color: transparent !important;
-  box-shadow:none !important;
-  padding:0 !important;
-  margin:0 !important;
-  border-radius:18px !important;
-}
-.card .stButton > button:focus{ outline:none !important; box-shadow:none !important; }
-.card .stButton > button:hover{ background: rgba(30,58,138,.03) !important; }
-
-/* processos cards */
+/* processos */
 .proc-card{
   width:100%;
   border-radius:18px;
@@ -350,19 +351,7 @@ label, small, .stCaption{ display:none !important; }
   margin-top:6px;
 }
 
-.copy{
-  position:fixed;
-  bottom:14px;
-  left:0; right:0;
-  text-align:center;
-  color: rgba(30,58,138,.45);
-  font-size:11px;
-  letter-spacing:.14em;
-  font-weight:800;
-  pointer-events:none;
-}
-
-/* LOGIN */
+/* login */
 .logo-wrap{
   width: 320px;
   max-width: 82vw;
@@ -411,6 +400,7 @@ label, small, .stCaption{ display:none !important; }
   line-height: 1;
   letter-spacing: .25em;
 }
+
 div[data-testid="stTextInput"]{ width: 100% !important; }
 div[data-testid="stTextInput"] [data-baseweb="base-input"]{
   border: none !important;
@@ -449,14 +439,29 @@ div[data-testid="stFormSubmitButton"] button{
   box-shadow: 0 10px 26px rgba(0,0,0,.08) !important;
 }
 div[data-testid="stFormSubmitButton"] button:hover{ background: var(--blue2) !important; }
+
+.copy{
+  position:fixed;
+  bottom:14px;
+  left:0; right:0;
+  text-align:center;
+  color: rgba(30,58,138,.45);
+  font-size:11px;
+  letter-spacing:.14em;
+  font-weight:800;
+  pointer-events:none;
+}
 </style>
 """
 )
 
 
-def goto(tela: str):
-    st.session_state["tela"] = tela
-    st.rerun()
+def set_route(go: str, token: str):
+    st.query_params.clear()
+    st.query_params["go"] = go
+    if token:
+        st.query_params["token"] = token
+    st.session_state["tela"] = go
 
 
 def logout():
@@ -464,47 +469,60 @@ def logout():
     st.session_state["tela"] = "login"
     st.session_state["cpf_visual"] = ""
     st.session_state["cpf_digits"] = ""
+    st.session_state["token"] = ""
+    st.query_params.clear()
     st.rerun()
 
 
-def topbar(title: str, show_back: bool, show_exit: bool):
+def sync_from_url():
+    go = (st.query_params.get("go") or "").strip().lower()
+    token = (st.query_params.get("token") or "").strip()
+
+    # se token válido, considera logado (mesmo após reload)
+    cpf = parse_token(token)
+    if cpf == VALID_CPF:
+        st.session_state["logado"] = True
+        st.session_state["token"] = token
+        if go in {"dashboard", "processos", "acordos"}:
+            st.session_state["tela"] = go
+        else:
+            st.session_state["tela"] = "dashboard"
+    else:
+        # sem token válido: só deixa ver login
+        st.session_state["logado"] = False
+        st.session_state["token"] = ""
+        st.session_state["tela"] = "login"
+
+    if go == "logout":
+        logout()
+
+
+def topbar(title: str, show_back: bool, back_to: str, show_exit: bool):
+    token = st.session_state.get("token", "")
+    back_href = ""
+    exit_href = ""
+    if show_back:
+        back_href = f'?go={back_to}&token={token}'
+    if show_exit:
+        exit_href = f'?go=logout'
+
     md(
         f"""
 <div class="topbar">
   <div class="topbar-inner">
+    <div class="top-left">
+      {f'<a class="top-btn" href="{back_href}" target="_self" rel="noopener">{BACK_SVG}</a>' if show_back else ''}
+    </div>
+
     <div class="topbar-title">{title}</div>
+
+    <div class="top-right">
+      {f'<a class="exit-link" href="{exit_href}" target="_self" rel="noopener">SAIR</a>' if show_exit else ''}
+    </div>
   </div>
 </div>
 """
     )
-
-    md('<div class="top-actions"><div class="top-actions-inner">')
-
-    # slot esquerdo
-    md('<div class="slot">')
-    if show_back:
-        if st.button(" ", key=f"back_{title}"):
-            goto("dashboard")
-        # coloca o SVG por cima do botão (visual)
-        md(
-            f"""
-<div style="position:relative; margin-top:-38px; width:38px; height:38px; border-radius:12px;
-            border:1px solid rgba(255,255,255,.22); background:rgba(255,255,255,.12);
-            display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,.95);">
-  {BACK_SVG}
-</div>
-"""
-        )
-    md("</div>")
-
-    # slot direito
-    md('<div class="slot">')
-    if show_exit:
-        if st.button("SAIR", key=f"exit_{title}"):
-            logout()
-    md("</div>")
-
-    md("</div></div>")
 
 
 def view_login():
@@ -538,7 +556,10 @@ def view_login():
                 st.error("CPF inválido.")
             elif digits == VALID_CPF:
                 st.session_state["logado"] = True
-                goto("dashboard")
+                token = make_token(digits)
+                st.session_state["token"] = token
+                set_route("dashboard", token)
+                st.rerun()
             else:
                 st.error("CPF não cadastrado.")
 
@@ -547,8 +568,9 @@ def view_login():
 
 
 def view_dashboard():
+    token = st.session_state.get("token", "")
     md('<div id="wrap">')
-    topbar("Dashboard", show_back=False, show_exit=True)
+    topbar("Dashboard", show_back=False, back_to="dashboard", show_exit=True)
     md('<div class="inner">')
 
     md(
@@ -560,45 +582,30 @@ def view_dashboard():
     <div class="user-sub">Selecione uma opção</div>
   </div>
 </div>
+
+<div class="grid">
+  <a class="cardlink" href="?go=processos&token={token}" target="_self" rel="noopener">
+    <div class="cardicon">{ICON_DOC}</div>
+    <div class="cardtitle">PROCESSOS</div>
+    <div class="cardsub">Consultar andamento</div>
+  </a>
+
+  <a class="cardlink" href="?go=acordos&token={token}" target="_self" rel="noopener">
+    <div class="cardicon">{ICON_HANDSHAKE}</div>
+    <div class="cardtitle">ACORDOS</div>
+    <div class="cardsub">Ver propostas</div>
+  </a>
+</div>
 """
     )
 
-    md('<div class="grid">')
-
-    # CARD PROCESSOS
-    md(
-        f"""
-<div class="card">
-  <div class="cardicon">{ICON_DOC}</div>
-  <div class="cardtitle">PROCESSOS</div>
-  <div class="cardsub">Consultar andamento</div>
-"""
-    )
-    if st.button("\u200b", key="go_processos"):
-        goto("processos")
-    md("</div>")
-
-    # CARD ACORDOS
-    md(
-        f"""
-<div class="card">
-  <div class="cardicon">{ICON_HANDSHAKE}</div>
-  <div class="cardtitle">ACORDOS</div>
-  <div class="cardsub">Ver propostas</div>
-"""
-    )
-    if st.button("\u200b", key="go_acordos"):
-        goto("acordos")
-    md("</div>")
-
-    md("</div>")  # grid
     md("</div></div>")
     md('<div class="copy">© AMR SOFTWARES</div>')
 
 
 def view_processos():
     md('<div id="wrap">')
-    topbar("Processos", show_back=True, show_exit=True)
+    topbar("Processos", show_back=True, back_to="dashboard", show_exit=True)
     md('<div class="inner">')
 
     for p in PROCESSOS:
@@ -618,7 +625,7 @@ def view_processos():
 
 def view_acordos():
     md('<div id="wrap">')
-    topbar("Acordos", show_back=True, show_exit=True)
+    topbar("Acordos", show_back=True, back_to="dashboard", show_exit=True)
     md('<div class="inner">')
 
     st.info("Em atualização")
@@ -627,7 +634,9 @@ def view_acordos():
     md('<div class="copy">© AMR SOFTWARES</div>')
 
 
-# ===== Router =====
+# ===== Start =====
+sync_from_url()
+
 if not st.session_state["logado"]:
     view_login()
 else:
