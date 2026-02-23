@@ -30,296 +30,185 @@ if "cpf_visual" not in st.session_state:
 if "cpf_digits" not in st.session_state:
     st.session_state["cpf_digits"] = ""
 
-logo_b64 = get_base64("1000423374.jpg")  # NOME ORIGINAL
+logo_b64 = get_base64("1000423374.jpg")
 
-st.markdown(
-    """
+st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
 
-*{ box-sizing: border-box !important; }
-
-:root{
-  --blueBrand: #1E3A8A;
-  --blueTop: #2D2BBF;
-  --blueBot: #1F1C8F;
-  --stroke: rgba(17,24,39,.10);
-  --radius: 18px;
-  --shadowBtn: 0 18px 40px rgba(0,0,0,.18);
-  --shadowBtnHover: 0 24px 54px rgba(0,0,0,.22);
-}
+*{ box-sizing:border-box !important; }
 
 [data-testid="stHeader"], footer, #MainMenu{display:none !important;}
 html, body{margin:0 !important; padding:0 !important; height:100% !important;}
 body{overflow:hidden !important;}
 
-.stApp{ background:#FFFFFF !important; font-family: Inter, sans-serif !important; }
+.stApp{ background:#FFFFFF !important; font-family:Inter,sans-serif !important; }
 .block-container{ padding:0 !important; margin:0 !important; }
-[data-testid="stMainViewContainer"]{ padding:0 !important; margin:0 !important; }
 
-/* ===== Overlay definitivo ===== */
 #hero{
-  position: fixed !important;
-  inset: 0 !important;
+  position:fixed !important;
+  inset:0 !important;
   display:flex !important;
   flex-direction:column !important;
   align-items:center !important;
   justify-content:center !important;
+  padding:22px 18px 60px 18px !important;
   background:#FFFFFF !important;
-  overflow:hidden !important;
-  padding: 22px 18px 56px 18px !important; /* espaço pro copyright */
   text-align:center !important;
 }
 
-#hero .stMarkdown,
-#hero [data-testid="stMarkdown"]{
-  width:100% !important;
-  display:flex !important;
-  justify-content:center !important;
-}
-
-.hero-inner{
-  width:100% !important;
-  max-width: 380px !important;
-  display:flex !important;
-  flex-direction:column !important;
-  align-items:center !important;
-  justify-content:center !important;
-  margin: 0 auto !important;
-}
-
-/* ===== LOGO (igual ao que já ficou bom) ===== */
+/* ===== LOGO ===== */
 .logo-wrapper{
-  width: 320px;
-  max-width: 82vw;
-  height: 260px;
+  width:320px;
+  max-width:82vw;
+  height:260px;
   overflow:hidden;
   position:relative;
   display:flex;
   align-items:flex-start;
   justify-content:center;
-  margin: 0 auto 10px auto;
+  margin:0 auto 10px auto;
 }
 
 .logo{
-  width: 190%;
-  height: auto;
-  transform: translateY(-14px);
-  display:block;
+  width:190%;
+  transform:translateY(-14px);
 }
 
 .logo-wrapper::after{
   content:"";
   position:absolute;
   left:0; right:0; bottom:0;
-  height: 86px;
-  background: linear-gradient(
+  height:86px;
+  background:linear-gradient(
     180deg,
     rgba(255,255,255,0) 0%,
-    rgba(255,255,255,0.82) 55%,
+    rgba(255,255,255,.82) 55%,
     rgba(255,255,255,1) 100%
   );
-  pointer-events:none;
 }
 
 .brand{
-  font-size: 32px;
-  font-weight: 900;
-  letter-spacing: .10em;
-  color: var(--blueBrand) !important;
-  margin: 2px 0 2px 0;
-  text-align:center !important;
-  width:100%;
+  font-size:32px;
+  font-weight:900;
+  letter-spacing:.10em;
+  color:#1E3A8A;
+  margin:2px 0;
 }
 
 .subtitle{
-  font-size: 12px;
-  letter-spacing: .25em;
-  font-weight: 800;
-  color: rgba(30, 58, 138, .55);
-  margin: 0 0 18px 0;
-  text-align:center !important;
-  width:100%;
+  font-size:12px;
+  letter-spacing:.25em;
+  font-weight:800;
+  color:rgba(30,58,138,.55);
+  margin-bottom:18px;
 }
 
-/* ===== FORM CENTRALIZADO ===== */
-.form-wrap{
-  width:100% !important;
-  max-width: 360px !important;
-  margin: 0 auto !important;
-  display:block !important;
-}
-
-/* força o <form> a ocupar toda a largura e centralizar */
+/* ===== FORM ===== */
 #hero form{
   width:100% !important;
-  max-width: 360px !important;
-  margin: 0 auto !important;
+  max-width:360px !important;
+  margin:0 auto !important;
 }
 
 /* ===== INPUT ===== */
 div[data-testid="stTextInput"]{
   width:100% !important;
-  max-width: 360px !important;
-  margin: 0 auto !important;
-}
-
-div[data-testid="stTextInput"] > div,
-div[data-testid="stTextInput"] > div > div,
-div[data-testid="stTextInput"] > div > div > div{
-  background:transparent !important;
-  border:0 !important;
-  box-shadow:none !important;
-  padding:0 !important;
-  margin:0 !important;
+  max-width:360px !important;
+  margin:0 auto !important;
 }
 
 div[data-testid="stTextInput"] input{
   width:100% !important;
   height:56px !important;
-  border-radius: var(--radius) !important;
-  border:1px solid var(--stroke) !important;
+  border-radius:18px !important;
+  border:1px solid rgba(17,24,39,.10) !important;
   padding:0 16px !important;
   font-size:15px !important;
   background:#F9FAFB !important;
-  text-align:left !important;
 }
+
 div[data-testid="stTextInput"] input:focus{
   border:1px solid rgba(45,43,191,.45) !important;
   box-shadow:0 0 0 4px rgba(45,43,191,.12) !important;
   background:#FFF !important;
 }
 
-/* =========================================================
-   ===== BOTÃO: CORREÇÃO DEFINITIVA (pega TODOS wrappers) =====
-   Streamlit às vezes cria wrappers com fit-content.
-   Aqui a gente força: wrapper -> 100% / block / flex:1
-   ========================================================= */
+/* =======================================================
+   ===== BOTÃO FINAL (FULL WIDTH REAL + FLAT STYLE) =====
+   ======================================================= */
 
-/* pega qualquer bloco de botão dentro do hero */
-#hero .stButton,
-#hero div.stButton,
-#hero [data-testid="stFormSubmitButton"],
-#hero [data-testid="stFormSubmitButton"] > div{
-  width:100% !important;
-  max-width: 360px !important;
-  margin-left:auto !important;
-  margin-right:auto !important;
-  display:block !important;
-}
-
-/* alguns builds colocam o botão dentro de flex containers */
 #hero [data-testid="stFormSubmitButton"]{
-  margin-top: 14px !important;
-}
-
-/* força o wrapper imediato virar flex 100% */
-#hero [data-testid="stFormSubmitButton"] > div{
-  display:flex !important;
-  justify-content:center !important;
-}
-
-/* força stButton wrapper virar flex e ocupar tudo */
-#hero .stButton{
-  display:flex !important;
   width:100% !important;
-}
-#hero .stButton > button{
-  flex: 1 1 auto !important;
+  max-width:360px !important;
+  margin:14px auto 0 auto !important;
 }
 
-/* botão final */
-#hero button,
-#hero button[kind="primary"],
-#hero .stButton > button{
+#hero [data-testid="stFormSubmitButton"] > div,
+#hero .stButton,
+#hero .stButton > div{
+  width:100% !important;
+  max-width:none !important;
+  display:block !important;
+  margin:0 !important;
+  padding:0 !important;
+}
+
+#hero button{
   width:100% !important;
   min-width:100% !important;
+  max-width:none !important;
   height:64px !important;
-  border-radius: 18px !important;
+
+  border-radius:18px !important;
   border:none !important;
-  background: linear-gradient(180deg, var(--blueTop), var(--blueBot)) !important;
-  color:#FFF !important;
-  font-size: 17px !important;
-  font-weight: 800 !important;
-  box-shadow: var(--shadowBtn) !important;
 
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
+  background:#1F2DBF !important;   /* azul flat do mock */
+  color:#FFFFFF !important;
+  font-size:17px !important;
+  font-weight:800 !important;
+
   text-align:center !important;
-  padding:0 !important;
 
-  transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
-  position:relative !important;
-  overflow:hidden !important;
+  box-shadow:0 4px 14px rgba(0,0,0,.12) !important; /* sombra suave */
+  transition:all .15s ease;
 }
 
-#hero button::before{
-  content:"";
-  position:absolute;
-  top:-30%;
-  left:-60%;
-  width: 50%;
-  height: 160%;
-  background: linear-gradient(120deg, rgba(255,255,255,0), rgba(255,255,255,.22), rgba(255,255,255,0));
-  transform: rotate(18deg);
-  opacity: 0;
-}
 #hero button:hover{
-  transform: translateY(-1px);
-  box-shadow: var(--shadowBtnHover) !important;
-  filter: brightness(1.03);
+  background:#1A27A8 !important;
 }
-#hero button:hover::before{
-  animation: sheen .85s ease;
-  opacity: 1;
-}
+
 #hero button:active{
-  transform: translateY(0px) scale(.99);
-  filter: brightness(.99);
-  box-shadow: var(--shadowBtn) !important;
-}
-@keyframes sheen{
-  0%   { left:-60%; opacity:0; }
-  20%  { opacity:1; }
-  100% { left:120%; opacity:0; }
+  transform:scale(.98) !important;
 }
 
-/* ===== COPYRIGHT FIXO ===== */
+/* ===== COPYRIGHT ===== */
 .copy{
-  position: fixed;
-  left:0; right:0;
-  bottom: 14px;
+  position:fixed;
+  bottom:14px;
+  left:0;
+  right:0;
   text-align:center;
-  font-size: 11px;
-  letter-spacing: .14em;
-  font-weight: 700;
-  color: rgba(30, 58, 138, .45);
-  pointer-events:none;
+  font-size:11px;
+  letter-spacing:.14em;
+  font-weight:700;
+  color:rgba(30,58,138,.45);
 }
 
-/* limpa coisas */
-small, .stCaption { display:none !important; }
-label{display:none !important;}
+label, small, .stCaption{display:none !important;}
+
 </style>
-""",
-    unsafe_allow_html=True
-)
+""", unsafe_allow_html=True)
 
-st.markdown('<div id="hero"><div class="hero-inner">', unsafe_allow_html=True)
+st.markdown('<div id="hero">', unsafe_allow_html=True)
 
-st.markdown(
-    f"""
-    <div class="logo-wrapper">
-      <img src="data:image/jpeg;base64,{logo_b64}" class="logo"/>
-    </div>
-    <div class="brand">{APP_NAME}</div>
-    <div class="subtitle">{SUBTITLE}</div>
-    """,
-    unsafe_allow_html=True
-)
-
-st.markdown('<div class="form-wrap">', unsafe_allow_html=True)
+st.markdown(f"""
+<div class="logo-wrapper">
+  <img src="data:image/jpeg;base64,{logo_b64}" class="logo"/>
+</div>
+<div class="brand">{APP_NAME}</div>
+<div class="subtitle">{SUBTITLE}</div>
+""", unsafe_allow_html=True)
 
 with st.form("cpf_form", clear_on_submit=False):
     cpf_visual = st.text_input(
@@ -335,8 +224,6 @@ with st.form("cpf_form", clear_on_submit=False):
 
     submitted = st.form_submit_button("Verificar CPF")
 
-st.markdown('</div>', unsafe_allow_html=True)
-
 if submitted:
     if len(st.session_state["cpf_digits"]) != 11:
         st.error("CPF inválido.")
@@ -345,7 +232,6 @@ if submitted:
     else:
         st.error("CPF não cadastrado.")
 
-st.markdown('</div></div>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
-# copyright
 st.markdown('<div class="copy">© AMR SOFTWARES</div>', unsafe_allow_html=True)
