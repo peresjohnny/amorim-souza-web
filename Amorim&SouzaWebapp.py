@@ -34,38 +34,50 @@ if "cpf_digits" not in st.session_state:
     st.session_state["cpf_digits"] = ""
 
 # =========================
-# LOGO ORIGINAL (SEU ARQUIVO)
+# LOGO ORIGINAL
 # =========================
 logo_b64 = get_base64("1000423374.jpg")
 
 # =========================
-# CSS LIMPO E FIEL AO MOCK
+# CSS
 # =========================
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
 
 :root{
+  --blueBrand: #1E3A8A;
   --blueTop: #2D2BBF;
   --blueBot: #1F1C8F;
   --stroke: rgba(17,24,39,.10);
+  --radius: 16px;
+  --shadowBtn: 0 16px 34px rgba(0,0,0,.16);
+  --shadowBtnHover: 0 22px 44px rgba(0,0,0,.18);
 }
 
-[data-testid="stHeader"], footer, #MainMenu{display:none;}
-html, body{margin:0;padding:0;}
+[data-testid="stHeader"], footer, #MainMenu{display:none !important;}
+html, body{margin:0 !important; padding:0 !important;}
 
 .stApp{
-  background:#FFFFFF;
-  font-family: Inter, sans-serif;
+  background:#FFFFFF !important;
+  font-family: Inter, sans-serif !important;
+}
+
+[data-testid="stMainViewContainer"] > div:first-child{
+  max-width: 430px !important;
+  margin: 0 auto !important;
+  padding-left: 18px !important;
+  padding-right: 18px !important;
 }
 
 .block-container{
-  padding-top:40px;
-  padding-bottom:40px;
+  padding-top: 40px !important;
+  padding-bottom: 40px !important;
 }
 
+/* Layout central */
 .page{
-  min-height:100vh;
+  min-height: 100vh;
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -73,67 +85,157 @@ html, body{margin:0;padding:0;}
   text-align:center;
 }
 
+/* ===== Logo cortada + FADE premium ===== */
+.logo-wrapper{
+  width: 230px;
+  height: 260px;      /* controla o corte */
+  overflow: hidden;
+  margin: 0 auto 10px auto;
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+/* imagem recortada */
 .logo{
-  width:220px;
-  max-width:70vw;
-  margin-bottom:12px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+  display:block;
 }
 
+/* fade inferior (some suave no branco) */
+.logo-wrapper::after{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height: 72px; /* força do fade */
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.75) 55%,
+    rgba(255,255,255,1) 100%
+  );
+  pointer-events:none;
+}
+
+/* Nome azul correto */
 .brand{
-  font-size:28px;
-  font-weight:900;
-  letter-spacing:.08em;
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  color: var(--blueBrand) !important;
+  margin-top: 6px;
 }
 
+/* Subtitulo */
 .subtitle{
-  font-size:12px;
-  letter-spacing:.25em;
-  font-weight:700;
-  color:rgba(0,0,0,.4);
-  margin-bottom:25px;
+  font-size: 12px;
+  letter-spacing: .25em;
+  font-weight: 800;
+  color: rgba(30, 58, 138, .55);
+  margin-bottom: 22px;
 }
 
-/* Remove wrapper duplicado */
+/* Remove wrapper duplicado do input */
 div[data-testid="stTextInput"] > div,
-div[data-testid="stTextInput"] > div > div{
+div[data-testid="stTextInput"] > div > div,
+div[data-testid="stTextInput"] > div > div > div{
   background:transparent !important;
   border:0 !important;
   box-shadow:none !important;
+  padding:0 !important;
+  margin:0 !important;
+  height:auto !important;
+  min-height:0 !important;
 }
 
 /* Input */
 div[data-testid="stTextInput"] input{
   width:100% !important;
-  max-width:360px;
-  height:50px !important;
-  border-radius:14px !important;
+  max-width:360px !important;
+  height:52px !important;
+  border-radius: var(--radius) !important;
   border:1px solid var(--stroke) !important;
-  padding:0 15px !important;
+  padding:0 16px !important;
   font-size:15px !important;
   background:#F9FAFB !important;
 }
-
 div[data-testid="stTextInput"] input:focus{
-  border:1px solid rgba(45,43,191,.5) !important;
+  border:1px solid rgba(45,43,191,.45) !important;
   box-shadow:0 0 0 4px rgba(45,43,191,.12) !important;
   background:#FFF !important;
 }
 
-/* Botão */
-div[data-testid="stFormSubmitButton"] > button{
-  width:100% !important;
-  max-width:360px;
-  height:55px !important;
-  border-radius:14px !important;
-  border:none !important;
-  background:linear-gradient(180deg,var(--blueTop),var(--blueBot)) !important;
-  color:#FFF !important;
-  font-size:16px !important;
-  font-weight:800 !important;
-  margin-top:15px;
+/* ===== Botão grande + ANIMAÇÃO SUAVE ===== */
+div[data-testid="stFormSubmitButton"]{
+  width: 100% !important;
+  max-width: 360px !important;
+  margin: 16px auto 0 auto !important;
 }
 
-label{display:none;}
+div[data-testid="stFormSubmitButton"] > button{
+  width: 100% !important;
+  height: 60px !important;
+  border-radius: 16px !important;
+  border: none !important;
+  background: linear-gradient(180deg, var(--blueTop), var(--blueBot)) !important;
+  color: #FFF !important;
+  font-size: 17px !important;
+  font-weight: 800 !important;
+  box-shadow: var(--shadowBtn) !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  padding: 0 !important;
+
+  transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* brilho sutil passando (premium) */
+div[data-testid="stFormSubmitButton"] > button::before{
+  content:"";
+  position:absolute;
+  top:-30%;
+  left:-60%;
+  width: 50%;
+  height: 160%;
+  background: linear-gradient(120deg, rgba(255,255,255,0), rgba(255,255,255,.22), rgba(255,255,255,0));
+  transform: rotate(18deg);
+  opacity: 0;
+}
+
+div[data-testid="stFormSubmitButton"] > button:hover{
+  transform: translateY(-1px);
+  box-shadow: var(--shadowBtnHover) !important;
+  filter: brightness(1.03);
+}
+div[data-testid="stFormSubmitButton"] > button:hover::before{
+  animation: sheen 0.85s ease;
+  opacity: 1;
+}
+
+div[data-testid="stFormSubmitButton"] > button:active{
+  transform: translateY(0px) scale(.99);
+  filter: brightness(.99);
+  box-shadow: var(--shadowBtn) !important;
+}
+
+@keyframes sheen{
+  0%   { left:-60%; opacity:0; }
+  20%  { opacity:1; }
+  100% { left:120%; opacity:0; }
+}
+
+small, .stCaption { display:none !important; }
+label{display:none !important;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -143,14 +245,18 @@ label{display:none;}
 st.markdown('<div class="page">', unsafe_allow_html=True)
 
 st.markdown(
-    f'<img src="data:image/jpeg;base64,{logo_b64}" class="logo">',
+    f'''
+    <div class="logo-wrapper">
+        <img src="data:image/jpeg;base64,{logo_b64}" class="logo">
+    </div>
+    ''',
     unsafe_allow_html=True
 )
 
 st.markdown(f'<div class="brand">{APP_NAME}</div>', unsafe_allow_html=True)
 st.markdown(f'<div class="subtitle">{SUBTITLE}</div>', unsafe_allow_html=True)
 
-with st.form("cpf_form"):
+with st.form("cpf_form", clear_on_submit=False):
     cpf_visual = st.text_input(
         "CPF",
         value=st.session_state["cpf_visual"],
