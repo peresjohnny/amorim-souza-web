@@ -1,6 +1,7 @@
 import re
 import base64
 import streamlit as st
+import streamlit.components.v1 as components
 from textwrap import dedent
 
 APP_NAME = "AMORIM & SOUZA"
@@ -45,8 +46,6 @@ def format_cpf(d: str) -> str:
 
 
 def make_token(cpf_digits: str) -> str:
-    # Simples e suficiente pro seu caso (não é “segurança bancária”).
-    # Mantém o usuário logado mesmo se o Streamlit recarregar.
     raw = f"ok:{cpf_digits}"
     return base64.urlsafe_b64encode(raw.encode("utf-8")).decode("utf-8").rstrip("=")
 
@@ -147,7 +146,7 @@ html, body{ margin:0 !important; padding:0 !important; height:100% !important; }
   -webkit-overflow-scrolling:touch;
 }
 
-/* TOPBAR fixa no topo, sem branco */
+/* TOPBAR fixa no topo */
 .topbar{
   position:fixed;
   top:0; left:0; right:0;
@@ -186,11 +185,12 @@ html, body{ margin:0 !important; padding:0 !important; height:100% !important; }
 .top-left{ left: var(--pad); }
 .top-right{ right: var(--pad); }
 
-/* Links minimalistas na topbar */
 .topbar a{
   text-decoration:none !important;
   color: rgba(255,255,255,.95) !important;
 }
+
+/* back icon */
 .top-btn{
   width:38px;
   height:38px;
@@ -203,14 +203,14 @@ html, body{ margin:0 !important; padding:0 !important; height:100% !important; }
 }
 .top-btn svg{ width:18px; height:18px; }
 
+/* SAIR minimalista (só texto branco) */
 .exit-link{
   font-size:12px;
   font-weight:900;
   letter-spacing:.10em;
-  padding: 10px 10px;
-  border-radius: 10px;
-  background: rgba(255,255,255,.12);
-  border: 1px solid rgba(255,255,255,.18);
+  padding: 6px 2px;
+  background: transparent;
+  border: none;
 }
 
 /* Conteúdo abaixo da topbar */
@@ -273,7 +273,7 @@ label, small, .stCaption{ display:none !important; }
   margin-top: 8px;
 }
 
-/* card agora é <a> e fica perfeito */
+/* card */
 .cardlink{
   display:flex;
   flex-direction:column;
@@ -478,7 +478,6 @@ def sync_from_url():
     go = (st.query_params.get("go") or "").strip().lower()
     token = (st.query_params.get("token") or "").strip()
 
-    # se token válido, considera logado (mesmo após reload)
     cpf = parse_token(token)
     if cpf == VALID_CPF:
         st.session_state["logado"] = True
@@ -488,7 +487,6 @@ def sync_from_url():
         else:
             st.session_state["tela"] = "dashboard"
     else:
-        # sem token válido: só deixa ver login
         st.session_state["logado"] = False
         st.session_state["token"] = ""
         st.session_state["tela"] = "login"
@@ -499,30 +497,26 @@ def sync_from_url():
 
 def topbar(title: str, show_back: bool, back_to: str, show_exit: bool):
     token = st.session_state.get("token", "")
-    back_href = ""
-    exit_href = ""
-    if show_back:
-        back_href = f'?go={back_to}&token={token}'
-    if show_exit:
-        exit_href = f'?go=logout'
+    back_href = f'?go={back_to}&token={token}' if show_back else ""
+    exit_href = '?go=logout' if show_exit else ""
 
-    md(
-        f"""
+    # Renderiza fora do markdown pra não “vazar” como texto
+    html = f"""
 <div class="topbar">
   <div class="topbar-inner">
     <div class="top-left">
-      {f'<a class="top-btn" href="{back_href}" target="_self" rel="noopener">{BACK_SVG}</a>' if show_back else ''}
+      {"<a class='top-btn' href='"+back_href+"' target='_self' rel='noopener'>"+BACK_SVG+"</a>" if show_back else ""}
     </div>
 
     <div class="topbar-title">{title}</div>
 
     <div class="top-right">
-      {f'<a class="exit-link" href="{exit_href}" target="_self" rel="noopener">SAIR</a>' if show_exit else ''}
+      {"<a class='exit-link' href='"+exit_href+"' target='_self' rel='noopener'>SAIR</a>" if show_exit else ""}
     </div>
   </div>
 </div>
 """
-    )
+    components.html(html, height=78, scrolling=False)
 
 
 def view_login():
