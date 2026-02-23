@@ -21,7 +21,6 @@ st.set_page_config(page_title=APP_NAME, layout="centered")
 
 
 def md(html: str):
-    """Renderiza HTML sem vazar como code block (remove indentação do markdown)."""
     st.markdown(dedent(html).strip("\n"), unsafe_allow_html=True)
 
 
@@ -45,6 +44,7 @@ def format_cpf(d: str) -> str:
     return f"{d[:3]}.{d[3:6]}.{d[6:9]}-{d[9:]}"
 
 
+# ===== State =====
 st.session_state.setdefault("logado", False)
 st.session_state.setdefault("tela", "login")  # login | dashboard | processos | acordos
 st.session_state.setdefault("cpf_visual", "")
@@ -90,6 +90,7 @@ BACK_SVG = """
 </svg>
 """
 
+# ===== CSS =====
 md(
     """
 <style>
@@ -103,7 +104,6 @@ md(
   --blue2:#2523A8;
   --border: rgba(30,58,138,.12);
   --shadow: 0 12px 22px rgba(0,0,0,.06);
-  --radius: 16px;
   --pad: 18px;
   --headerH: 54px;
   --warnBg:#FFD54A;
@@ -136,6 +136,7 @@ html, body{ margin:0 !important; padding:0 !important; height:100% !important; }
 
 label, small, .stCaption{ display:none !important; }
 
+/* TOPBAR (sem <a>, só layout visual) */
 .topbar{
   position:sticky;
   top:0;
@@ -150,7 +151,6 @@ label, small, .stCaption{ display:none !important; }
   letter-spacing:.06em;
   box-shadow: 0 10px 24px rgba(0,0,0,.10);
 }
-
 .topbar-inner{
   width:420px;
   max-width:94vw;
@@ -160,42 +160,40 @@ label, small, .stCaption{ display:none !important; }
   justify-content:center;
   position:relative;
 }
+.topbar-title{ font-weight:900; }
 
-.icon-btn{
-  position:absolute;
-  left: var(--pad);
-  top:50%;
-  transform:translateY(-50%);
-  width:38px;
-  height:38px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,.22);
-  background: rgba(255,255,255,.12);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color: rgba(255,255,255,.95);
-  text-decoration:none;
+/* Botões pequenos (voltar / sair) */
+.small-btn-row{
+  position:relative;
+  height:0;
+}
+.small-left, .small-right{
+  position:sticky;
+  top: 8px;
+  z-index:60;
+}
+.small-left{ float:left; margin-left: 12px; }
+.small-right{ float:right; margin-right: 12px; }
+
+div.small-left .stButton > button,
+div.small-right .stButton > button{
+  width:auto !important;
+  height:38px !important;
+  padding: 0 12px !important;
+  border-radius:12px !important;
+  border:1px solid rgba(255,255,255,.22) !important;
+  background: rgba(255,255,255,.12) !important;
+  color: rgba(255,255,255,.95) !important;
+  font-weight:900 !important;
+  letter-spacing:.10em !important;
+  box-shadow:none !important;
+}
+div.small-left .stButton > button:hover,
+div.small-right .stButton > button:hover{
+  background: rgba(255,255,255,.18) !important;
 }
 
-.icon-btn svg{ width:18px; height:18px; }
-
-.exit-link{
-  position:absolute;
-  right: var(--pad);
-  top:50%;
-  transform:translateY(-50%);
-  font-size:12px;
-  font-weight:900;
-  letter-spacing:.10em;
-  color: rgba(255,255,255,.95);
-  text-decoration:none;
-  padding: 10px 10px;
-  border-radius: 10px;
-  background: rgba(255,255,255,.10);
-  border: 1px solid rgba(255,255,255,.18);
-}
-
+/* User card */
 .user-card{
   width:100%;
   background:#fff;
@@ -210,7 +208,6 @@ label, small, .stCaption{ display:none !important; }
   margin-top: 14px;
   margin-bottom: 14px;
 }
-
 .avatar{
   width:44px;
   height:44px;
@@ -222,14 +219,12 @@ label, small, .stCaption{ display:none !important; }
   justify-content:center;
   color: var(--blue);
 }
-
 .user-title{
   font-size:20px;
   font-weight:900;
   color: var(--brand);
   line-height:1.1;
 }
-
 .user-sub{
   margin-top:3px;
   font-size:12px;
@@ -238,7 +233,8 @@ label, small, .stCaption{ display:none !important; }
   color: var(--sub);
 }
 
-.grid{
+/* Cards como BOTÕES (sem hiperlink) */
+.card-grid{
   width:100%;
   display:grid;
   grid-template-columns: 1fr 1fr;
@@ -246,22 +242,32 @@ label, small, .stCaption{ display:none !important; }
   margin-top: 8px;
 }
 
-.cardlink{
-  display:flex;
-  flex-direction:column;
-  align-items:flex-start;
-  gap:10px;
-  padding: 16px;
-  border-radius: 18px;
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-  background:#fff;
-  text-decoration:none;
-  color: inherit;
-  min-height: 132px;
+/* Base: todos botões viram "card" por padrão */
+.stButton{ width:100% !important; }
+.stButton > button{
+  width:100% !important;
+  min-height: 132px !important;
+  border-radius: 18px !important;
+  border: 1px solid var(--border) !important;
+  background:#fff !important;
+  color: #111827 !important;
+  box-shadow: var(--shadow) !important;
+  font-weight:900 !important;
+  font-size: 14px !important;
+  padding: 16px !important;
+  text-align:left !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:flex-start !important;
+  justify-content:flex-start !important;
+  gap: 10px !important;
+}
+.stButton > button:hover{
+  border-color: rgba(30,58,138,.22) !important;
 }
 
-.cardicon{
+/* Conteúdo interno do "card button" */
+.card-icon{
   width:44px;
   height:44px;
   border-radius:16px;
@@ -272,70 +278,68 @@ label, small, .stCaption{ display:none !important; }
   border:1px solid rgba(45,43,191,.18);
   color: var(--blue);
 }
-
-.cardtitle{
+.card-title{
   font-size:14px;
   font-weight:900;
   letter-spacing:.08em;
   color: var(--brand);
 }
-
-.cardsub{
+.card-sub{
   font-size:12px;
   font-weight:700;
   color: rgba(17,24,39,.55);
   margin-top:-2px;
 }
 
-.proc-card{
-  width:100%;
-  border-radius:18px;
-  border:1px solid var(--border);
-  background:#fff;
-  box-shadow: var(--shadow);
-  padding: 14px;
-  margin-bottom: 12px;
-  text-align:left;
+/* LOGIN: submit azul (sobrescreve o padrão de card) */
+div[data-testid="stFormSubmitButton"] .stButton > button,
+div[data-testid="stFormSubmitButton"] button{
+  min-height: 54px !important;
+  height: 54px !important;
+  border-radius: 18px !important;
+  border: none !important;
+  background: var(--blue) !important;
+  color:#fff !important;
+  font-weight: 900 !important;
+  font-size: 16px !important;
+  box-shadow: 0 10px 26px rgba(0,0,0,.08) !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+}
+div[data-testid="stFormSubmitButton"] button:hover{
+  background: var(--blue2) !important;
 }
 
-.proc-tag{
-  display:inline-block;
-  background: var(--warnBg);
-  color: var(--warnText);
-  font-weight:900;
-  font-size:10px;
-  padding: 6px 10px;
-  border-radius:10px;
-  letter-spacing:.06em;
-  margin-bottom:10px;
+/* INPUT */
+div[data-testid="stTextInput"]{ width: 100% !important; }
+div[data-testid="stTextInput"] [data-baseweb="base-input"]{
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+div[data-testid="stTextInput"] [data-baseweb="input"]{
+  width:100% !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: var(--inputBg) !important;
+  border-radius: 18px !important;
+}
+div[data-testid="stTextInput"] input{
+  width:100% !important;
+  height: 54px !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  border-radius: 18px !important;
+  padding: 0 16px !important;
+  font-size: 15px !important;
+  color:#111827 !important;
 }
 
-.proc-label{
-  font-size:11px;
-  color: rgba(30,58,138,.70);
-  font-weight:800;
-}
-
-.proc-number{
-  font-size:14px;
-  color:#111827;
-  font-weight:900;
-  margin-top:6px;
-}
-
-.copy{
-  position:fixed;
-  bottom:14px;
-  left:0; right:0;
-  text-align:center;
-  color: rgba(30,58,138,.45);
-  font-size:11px;
-  letter-spacing:.14em;
-  font-weight:800;
-  pointer-events:none;
-}
-
-/* LOGIN (mantido) */
+/* LOGIN visual */
 .logo-wrap{
   width: 320px;
   max-width: 82vw;
@@ -385,64 +389,58 @@ label, small, .stCaption{ display:none !important; }
   letter-spacing: .25em;
 }
 
-/* INPUT sem borda feia */
-div[data-testid="stTextInput"]{ width: 100% !important; }
-div[data-testid="stTextInput"] [data-baseweb="base-input"]{
-  border: none !important;
-  box-shadow: none !important;
-  background: transparent !important;
+/* Processos */
+.proc-card{
+  width:100%;
+  border-radius:18px;
+  border:1px solid var(--border);
+  background:#fff;
+  box-shadow: var(--shadow);
+  padding: 14px;
+  margin-bottom: 12px;
+  text-align:left;
 }
-div[data-testid="stTextInput"] [data-baseweb="input"]{
-  width:100% !important;
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-  background: var(--inputBg) !important;
-  border-radius: 18px !important;
+.proc-tag{
+  display:inline-block;
+  background: var(--warnBg);
+  color: var(--warnText);
+  font-weight:900;
+  font-size:10px;
+  padding: 6px 10px;
+  border-radius:10px;
+  letter-spacing:.06em;
+  margin-bottom:10px;
 }
-div[data-testid="stTextInput"] input{
-  width:100% !important;
-  height: 54px !important;
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-  background: transparent !important;
-  border-radius: 18px !important;
-  padding: 0 16px !important;
-  font-size: 15px !important;
-  color:#111827 !important;
+.proc-label{
+  font-size:11px;
+  color: rgba(30,58,138,.70);
+  font-weight:800;
+}
+.proc-number{
+  font-size:14px;
+  color:#111827;
+  font-weight:900;
+  margin-top:6px;
 }
 
-/* botão login */
-.stButton{ width:100% !important; margin-top:12px !important; }
-.stButton > button{
-  width:100% !important;
-  height: 54px !important;
-  border-radius: 18px !important;
-  border: none !important;
-  background: var(--blue) !important;
-  color:#fff !important;
-  font-weight: 900 !important;
-  font-size: 16px !important;
-  box-shadow: 0 10px 26px rgba(0,0,0,.08) !important;
+.copy{
+  position:fixed;
+  bottom:14px;
+  left:0; right:0;
+  text-align:center;
+  color: rgba(30,58,138,.45);
+  font-size:11px;
+  letter-spacing:.14em;
+  font-weight:800;
+  pointer-events:none;
 }
-.stButton > button:hover{ background: var(--blue2) !important; }
 </style>
 """
 )
 
 
-def sync_route():
-    params = st.query_params
-    go = (params.get("go") or "").strip().lower()
-    if go in {"dashboard", "processos", "acordos"}:
-        st.session_state["tela"] = go
-
-
 def goto(tela: str):
     st.session_state["tela"] = tela
-    st.query_params.clear()
-    st.query_params["go"] = tela
     st.rerun()
 
 
@@ -451,26 +449,15 @@ def logout():
     st.session_state["tela"] = "login"
     st.session_state["cpf_visual"] = ""
     st.session_state["cpf_digits"] = ""
-    st.query_params.clear()
     st.rerun()
 
 
-def topbar(title: str, show_back: bool, back_to: str, show_exit: bool):
-    back_html = ""
-    exit_html = ""
-    if show_back:
-        # target="_self" para NÃO abrir nova aba no mobile
-        back_html = f'<a class="icon-btn" href="?go={back_to}" target="_self" rel="noopener">{BACK_SVG}</a>'
-    if show_exit:
-        exit_html = '<a class="exit-link" href="?go=logout" target="_self" rel="noopener">SAIR</a>'
-
+def topbar(title: str):
     md(
         f"""
 <div class="topbar">
   <div class="topbar-inner">
-    {back_html}
-    <div>{title}</div>
-    {exit_html}
+    <div class="topbar-title">{title}</div>
   </div>
 </div>
 """
@@ -518,7 +505,21 @@ def view_login():
 
 def view_dashboard():
     md('<div id="wrap">')
-    topbar("Dashboard", show_back=False, back_to="dashboard", show_exit=True)
+    topbar("Dashboard")
+
+    # botões no topo (SEM <a>)
+    md('<div class="small-btn-row">')
+    with st.container():
+        c1, c2, c3 = st.columns([1, 6, 1])
+        with c1:
+            pass
+        with c3:
+            md('<div class="small-right">')
+            if st.button("SAIR", key="btn_sair_dash"):
+                logout()
+            md("</div>")
+    md("</div>")
+
     md('<div class="inner">')
 
     md(
@@ -533,24 +534,26 @@ def view_dashboard():
 """
     )
 
-    # target="_self" evita abrir outra aba no mobile
-    md(
-        f"""
-<div class="grid">
-  <a class="cardlink" href="?go=processos" target="_self" rel="noopener">
-    <div class="cardicon">{ICON_DOC}</div>
-    <div class="cardtitle">PROCESSOS</div>
-    <div class="cardsub">Consultar andamento</div>
-  </a>
+    # grid de cards clicáveis (são botões, sem hyperlink)
+    c1, c2 = st.columns(2, gap="large")
 
-  <a class="cardlink" href="?go=acordos" target="_self" rel="noopener">
-    <div class="cardicon">{ICON_HANDSHAKE}</div>
-    <div class="cardtitle">ACORDOS</div>
-    <div class="cardsub">Ver propostas</div>
-  </a>
-</div>
-"""
-    )
+    with c1:
+        md(f"""
+<div class="card-icon">{ICON_DOC}</div>
+<div class="card-title">PROCESSOS</div>
+<div class="card-sub">Consultar andamento</div>
+""")
+        if st.button(" ", key="go_processos", help="Abrir Processos"):
+            goto("processos")
+
+    with c2:
+        md(f"""
+<div class="card-icon">{ICON_HANDSHAKE}</div>
+<div class="card-title">ACORDOS</div>
+<div class="card-sub">Ver propostas</div>
+""")
+        if st.button(" ", key="go_acordos", help="Abrir Acordos"):
+            goto("acordos")
 
     md("</div></div>")
     md('<div class="copy">© AMR SOFTWARES</div>')
@@ -558,7 +561,24 @@ def view_dashboard():
 
 def view_processos():
     md('<div id="wrap">')
-    topbar("Processos", show_back=True, back_to="dashboard", show_exit=True)
+    topbar("Processos")
+
+    # botões topo (voltar / sair) sem <a>
+    md('<div class="small-btn-row">')
+    with st.container():
+        c1, c2, c3 = st.columns([1, 6, 1])
+        with c1:
+            md('<div class="small-left">')
+            if st.button("◀", key="btn_back_proc"):
+                goto("dashboard")
+            md("</div>")
+        with c3:
+            md('<div class="small-right">')
+            if st.button("SAIR", key="btn_sair_proc"):
+                logout()
+            md("</div>")
+    md("</div>")
+
     md('<div class="inner">')
 
     for p in PROCESSOS:
@@ -578,20 +598,30 @@ def view_processos():
 
 def view_acordos():
     md('<div id="wrap">')
-    topbar("Acordos", show_back=True, back_to="dashboard", show_exit=True)
+    topbar("Acordos")
+
+    md('<div class="small-btn-row">')
+    with st.container():
+        c1, c2, c3 = st.columns([1, 6, 1])
+        with c1:
+            md('<div class="small-left">')
+            if st.button("◀", key="btn_back_acord"):
+                goto("dashboard")
+            md("</div>")
+        with c3:
+            md('<div class="small-right">')
+            if st.button("SAIR", key="btn_sair_acord"):
+                logout()
+            md("</div>")
+    md("</div>")
+
     md('<div class="inner">')
-
     st.info("Em atualização")
-
     md("</div></div>")
     md('<div class="copy">© AMR SOFTWARES</div>')
 
 
-sync_route()
-
-if st.query_params.get("go") == "logout":
-    logout()
-
+# ===== Router =====
 if not st.session_state["logado"]:
     view_login()
 else:
