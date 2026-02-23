@@ -4,74 +4,66 @@ import base64
 # --- CONFIGURAÇÃO DA PÁGINA ---
 st.set_page_config(page_title="Amorim & Souza", layout="centered")
 
-# --- FUNÇÃO PARA CARREGAR IMAGEM LOCAL ---
-def get_base64_image(image_path):
+# --- FUNÇÃO PARA CARREGAR IMAGEM ---
+def get_base64(path):
     try:
-        with open(image_path, "rb") as img_file:
-            return base64.b64encode(img_file.read()).decode()
+        with open(path, "rb") as f:
+            return base64.b64encode(f.read()).decode()
     except:
         return ""
 
-img_base64 = get_base64_image("1000423374.jpg")
+img_b64 = get_base64("1000423374.jpg")
 
-# --- CSS PREMIUM MOBILE-FIRST ---
+# --- CSS DE ALTA FIDELIDADE (AZUL CLARO / BORDAS AZUIS) ---
 st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
-    /* Reset Geral */
+    /* 1. Reset e Fundo Azulado quase branco */
     .stApp {{
-        background-color: #F8FAFC;
-        font-family: 'Inter', sans-serif;
+        background-color: #F0F7FF !important;
+        font-family: 'Inter', sans-serif !important;
     }}
 
-    /* Container Mobile Rigoroso */
+    /* 2. Container Centralizado 420px */
     [data-testid="stMainViewContainer"] > div:first-child {{
         max-width: 420px !important;
         margin: 0 auto !important;
-        background-color: #F8FAFC !important;
+        background-color: #F0F7FF !important;
     }}
 
-    /* Esconder Lixo do Streamlit */
-    header, footer, #MainMenu, [data-testid="stHeader"] {{
+    /* 3. Remoção de Lixo Nativo */
+    [data-testid="stHeader"], footer, #MainMenu {{
         display: none !important;
     }}
 
-    /* Logo Circular e Sombra */
+    /* 4. Logo Circular com Borda Azul */
     .logo-container {{
         display: flex;
         justify-content: center;
-        padding: 40px 0 20px 0;
+        padding-top: 50px;
+        margin-bottom: 30px;
     }}
     .logo-img {{
-        width: 130px;
-        height: 130px;
+        width: 150px;
+        height: 150px;
         border-radius: 50%;
         object-fit: cover;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        border: 3px solid white;
+        border: 4px solid #1A4A7A;
+        box-shadow: 0 10px 20px rgba(26, 74, 122, 0.15);
     }}
 
-    /* Títulos */
-    .app-title {{
-        color: #1A4A7A;
-        text-align: center;
-        font-weight: 700;
-        font-size: 24px;
-        margin-bottom: 40px;
-    }}
-
-    /* Inputs Centralizados */
+    /* 5. Inputs Arredondados e Centralizados */
     div[data-testid="stTextInput"] input {{
         border-radius: 12px !important;
         height: 55px !important;
         text-align: center !important;
-        border: 1px solid #E2E8F0 !important;
+        border: 2px solid #1A4A7A !important;
+        background-color: white !important;
         font-size: 16px !important;
-        box-shadow: inset 0 2px 4px rgba(0,0,0,0.02) !important;
     }}
 
-    /* Botão de Login */
+    /* 6. Botão de Login (Azul Escuro, 60px) */
     div.stButton > button {{
         width: 100% !important;
         background-color: #1A4A7A !important;
@@ -80,103 +72,87 @@ st.markdown(f"""
         height: 60px !important;
         font-weight: 700 !important;
         border: none !important;
-        box-shadow: 0 8px 20px rgba(26, 74, 122, 0.3) !important;
-        transition: all 0.3s;
+        box-shadow: 0 8px 15px rgba(26, 74, 122, 0.3) !important;
+        text-transform: uppercase;
     }}
 
-    /* Botões Dashboard (Grid) */
-    .dash-grid {{
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 15px;
-        margin-top: 20px;
-    }}
-    
+    /* 7. Botões Dashboard Lado a Lado */
     .stButton > button[kind="secondary"] {{
         background-color: white !important;
         color: #1A4A7A !important;
-        border: 1px solid #E2E8F0 !important;
+        border: 2px solid #1A4A7A !important;
         height: 100px !important;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.02) !important;
-        border-radius: 12px !important;
-        font-size: 14px !important;
+        font-weight: 600 !important;
     }}
 
-    /* Cards de Processo */
-    .process-card {{
+    /* 8. Card de Processos com Tag Amarela */
+    .p-card {{
         background: white;
+        border: 1px solid #1A4A7A;
         border-radius: 12px;
         padding: 20px;
-        margin-top: 15px;
-        border: 1px solid #E2E8F0;
+        margin-bottom: 15px;
         position: relative;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
     }}
-    .tag-yellow {{
+    .status-tag {{
         position: absolute;
-        top: 15px;
-        right: 15px;
-        background-color: #FEF08A;
-        color: #854D0E;
-        font-size: 10px;
-        font-weight: 800;
+        top: 10px;
+        right: 10px;
+        background: #FFD700;
+        color: #000;
+        font-size: 9px;
+        font-weight: 900;
         padding: 4px 8px;
         border-radius: 4px;
     }}
     </style>
     """, unsafe_allow_html=True)
 
-# --- ESTADOS DO APP ---
-if 'auth' not in st.session_state:
-    st.session_state.auth = False
-if 'view' not in st.session_state:
-    st.session_state.view = 'main'
+# --- LÓGICA DE NAVEGAÇÃO ---
+if 'logado' not in st.session_state:
+    st.session_state.logado = False
+if 'tela' not in st.session_state:
+    st.session_state.tela = 'login'
 
-# --- TELA 1: LOGIN ---
-if not st.session_state.auth:
-    st.markdown(f'<div class="logo-container"><img src="data:image/jpeg;base64,{img_base64}" class="logo-img"></div>', unsafe_allow_html=True)
-    st.markdown('<div class="app-title">Amorim & Souza</div>', unsafe_allow_html=True)
+# --- TELA DE LOGIN ---
+if not st.session_state.logado:
+    st.markdown(f'<div class="logo-container"><img src="data:image/jpeg;base64,{img_b64}" class="logo-img"></div>', unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center; color: #1A4A7A; margin-bottom: 40px;'>Amorim & Souza</h2>", unsafe_allow_html=True)
     
-    cpf_login = st.text_input("CPF", placeholder="Digite seu CPF", label_visibility="collapsed")
+    cpf = st.text_input("CPF", placeholder="Digite seu CPF", label_visibility="collapsed")
     
     if st.button("LOGIN"):
-        if cpf_login == "79897789120":
-            st.session_state.auth = True
+        if cpf == "79897789120":
+            st.session_state.logado = True
             st.rerun()
         else:
-            st.error("CPF não cadastrado na base de dados")
+            st.error("CPF não cadastrado na base de dados.")
 
-# --- TELA 2: ÁREA INTERNA ---
+# --- TELA DASHBOARD ---
 else:
-    st.markdown(f"<h2 style='text-align: center; color: #1A4A7A;'>Olá, Edimar</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='color: #1A4A7A;'>Olá, Edimar</h2>", unsafe_allow_html=True)
     
-    # Grid de botões lado a lado
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("📁\nProcessos", key="p_btn", use_container_width=True):
-            st.session_state.view = 'processos'
+        if st.button("📄\nPROCESSOS", key="p_btn"):
+            st.session_state.tela = 'processos'
     with col2:
-        if st.button("🤝\nAcordos", key="a_btn", use_container_width=True):
-            st.session_state.view = 'acordos'
+        if st.button("🤝\nACORDOS", key="a_btn"):
+            st.warning("Em atualização")
 
-    # Lógica de exibição das seções
-    if st.session_state.view == 'processos':
-        nums = ["0737767-85.2025.8.07.0001", "0757632-94.2025.8.07.0001", 
-                "0722313-65.2025.8.07.0001", "0768584-35.2025.8.07.0001", "0764797-95.2025.8.07.0001"]
-        for n in nums:
+    if st.session_state.tela == 'processos':
+        procs = ["0737767-85.2025.8.07.0001", "0757632-94.2025.8.07.0001", "0722313-65.2025.8.07.0001", "0768584-35.2025.8.07.0001", "0764797-95.2025.8.07.0001"]
+        for p in procs:
             st.markdown(f"""
-                <div class="process-card">
-                    <div class="tag-yellow">AGUARDANDO ATUALIZAÇÃO</div>
-                    <div style="font-size: 11px; color: #94A3B8;">Número Processual</div>
-                    <div style="font-weight: 700; color: #1E293B; font-size: 15px;">{n}</div>
+                <div class="p-card">
+                    <div class="status-tag">AGUARDANDO ATUALIZAÇÃO</div>
+                    <div style="font-size: 10px; color: #1A4A7A;">Número do Processo</div>
+                    <div style="font-weight: 700; color: #333;">{p}</div>
                 </div>
             """, unsafe_allow_html=True)
-            
-    elif st.session_state.view == 'acordos':
-        st.warning("Em atualização")
 
-    st.markdown("<br><br>", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
     if st.button("SAIR"):
-        st.session_state.auth = False
-        st.session_state.view = 'main'
+        st.session_state.logado = False
+        st.session_state.tela = 'login'
         st.rerun()
