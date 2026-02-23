@@ -1,125 +1,173 @@
 import streamlit as st
 
 # --- CONFIGURAÇÃO DA PÁGINA ---
-st.set_page_config(page_title="Amorim & Souza", layout="centered")
+st.set_page_config(page_title="Portal Jurídico", layout="centered", initial_sidebar_state="collapsed")
 
-# --- ESTILO CSS PARA FORMATO DE APP DE CELULAR ---
+# --- ESTILO CSS PREMIUM MOBILE-FIRST ---
 st.markdown("""
     <style>
-    /* Fundo azul muito claro */
+    /* Importação de Fonte */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+    /* Reset e Esconder Elementos Nativos */
+    #MainMenu, footer, header, [data-testid="stSidebarNav"] {vertical-align: hidden; display: none;}
+    
+    /* Container Principal Mobile-First */
     .stApp {
-        background-color: #f1f6fa;
+        background-color: #F8FAFC;
+        font-family: 'Inter', sans-serif;
     }
-    
-    /* Forçar largura de celular no Desktop e centralizar */
+
     [data-testid="stMainViewContainer"] > div:first-child {
-        max-width: 420px;
-        margin: 0 auto;
-        background-color: #f1f6fa;
-        padding-top: 20px;
+        max-width: 420px !important;
+        margin: 0 auto !important;
+        background-color: #F8FAFC;
     }
 
-    /* Títulos */
-    .titulo-app {
-        color: #1a4a7a;
-        font-family: 'Source Sans Pro', sans-serif;
-        font-weight: 700;
-        text-align: center;
-        font-size: 22px;
-        margin-top: 10px;
+    /* Logo Circular com Sombra */
+    .logo-container {
+        display: flex;
+        justify-content: center;
+        padding: 20px 0;
     }
-
-    /* Botão de Login Estilo Mobile */
-    .stButton > button {
-        width: 100%;
-        background-color: #1a4a7a;
-        color: white !important;
-        border-radius: 10px;
-        height: 55px;
-        font-size: 18px;
-        font-weight: 600;
-        border: none;
-        margin-top: 20px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    
-    .stButton > button:hover {
-        background-color: #143a5f;
-        border: none;
-    }
-
-    /* Inputs arredondados */
-    .stTextInput > div > div > input {
-        border-radius: 10px;
-        height: 50px;
-        border: 1px solid #dce4ec;
-        text-align: center;
-    }
-
-    /* Ajuste da Logo */
-    .stImage > img {
+    .logo-img {
+        width: 120px;
+        height: 120px;
         border-radius: 50%;
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
+        object-fit: cover;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
-    /* Esconder elementos nativos do Streamlit */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
+    /* Inputs Personalizados */
+    div[data-testid="stTextInput"] input {
+        border-radius: 12px !important;
+        height: 50px;
+        text-align: center;
+        border: 1px solid #E2E8F0 !important;
+        background-color: white !important;
+    }
+
+    /* Botão de Login Estilizado */
+    div.stButton > button {
+        width: 100% !important;
+        background-color: #1A4A7A !important;
+        color: white !important;
+        border-radius: 12px !important;
+        height: 60px !important;
+        font-weight: 700 !important;
+        font-size: 16px !important;
+        border: none !important;
+        box-shadow: 0 10px 15px -3px rgba(26, 74, 122, 0.3) !important;
+        transition: transform 0.2s;
+    }
+    div.stButton > button:active {
+        transform: scale(0.98);
+    }
+
+    /* Botões do Dashboard */
+    .dash-btn-container {
+        display: flex;
+        gap: 10px;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+    .stButton > button[kind="secondary"] {
+        background-color: white !important;
+        color: #1A4A7A !important;
+        border: 1px solid #E2E8F0 !important;
+        height: 100px !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+    }
+
+    /* Card de Processos */
+    .process-card {
+        background-color: white;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 12px;
+        position: relative;
+        border: 1px solid #E2E8F0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .status-tag {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: #FEF08A;
+        color: #854D0E;
+        font-size: 9px;
+        font-weight: 800;
+        padding: 4px 8px;
+        border-radius: 4px;
+        text-transform: uppercase;
+    }
+    .process-number {
+        font-size: 14px;
+        font-weight: 600;
+        color: #334155;
+        margin-top: 5px;
+    }
     </style>
     """, unsafe_allow_html=True)
 
-# --- BASE DE DADOS SIMULADA ---
-DB_CLIENTES = {
-    "79897789120": {
-        "nome": "Edimar",
-        "processos": [
-            "0737767-85.2025.8.07.0001",
-            "0757632-94.2025.8.07.0001",
-            "0722313-65.2025.8.07.0001",
-            "0768584-35.2025.8.07.0001",
-            "0764797-95.2025.8.07.0001"
-        ]
-    }
-}
-
+# --- LÓGICA DE SESSÃO ---
 if 'logado' not in st.session_state:
     st.session_state.logado = False
+if 'view' not in st.session_state:
+    st.session_state.view = 'home'
 
 # --- TELA DE LOGIN ---
 if not st.session_state.logado:
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown('<div class="logo-container">', unsafe_allow_html=True)
+    st.image("1000423374.jpg", width=120)
+    st.markdown('</div>', unsafe_allow_html=True)
     
-    # Logo Centralizada
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        st.image("1000423374.jpg", use_container_width=True)
+    st.markdown("<h3 style='text-align: center; color: #1A4A7A;'>Acesso ao Portal</h3>", unsafe_allow_html=True)
     
-    st.markdown("<p class='titulo-app'>Amorim & Souza Advogados</p>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; color: #1a4a7a; font-size: 14px;'>Portal de Consulta Processual</p>", unsafe_allow_html=True)
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    # Input de CPF
-    cpf_input = st.text_input("CPF ou CNH", placeholder="Digite apenas números")
+    cpf_input = st.text_input("CPF", placeholder="000.000.000-00", label_visibility="collapsed")
     
-    if st.button("Login"):
-        if cpf_input in DB_CLIENTES:
+    if st.button("ENTRAR"):
+        if cpf_input == "79897789120":
             st.session_state.logado = True
-            st.session_state.user_cpf = cpf_input
             st.rerun()
         else:
             st.error("CPF não cadastrado na base de dados.")
-    
-    st.markdown("<br><br><p style='text-align: center; color: #bdc3c7; font-size: 11px;'>© 2026 Amorim & Souza - Todos os direitos reservados.</p>", unsafe_allow_html=True)
 
-# --- ÁREA LOGADA ---
+# --- DASHBOARD INTERNO ---
 else:
-    cliente = DB_CLIENTES[st.session_state.user_cpf]
-    st.markdown(f"<h2 style='text-align: center; color: #1a4a7a;'>Olá, {cliente['nome']}!</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center; color: #1A4A7A; margin-bottom: 30px;'>Olá, Edimar</h2>", unsafe_allow_html=True)
     
-    # Adicione aqui o restante da lógica de botões que definimos antes
-    if st.button("Sair"):
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        if st.button("📄\n\nProcessos", key="btn_proc", use_container_width=True):
+            st.session_state.view = 'processos'
+            
+    with col2:
+        if st.button("🤝\n\nAcordos", key="btn_acod", use_container_width=True):
+            st.session_state.view = 'acordos'
+            st.warning("Em atualização")
+
+    st.markdown("---")
+
+    # --- LISTAGEM DE PROCESSOS ---
+    if st.session_state.view == 'processos':
+        processos = [
+            "0737767-85.2025.8.07.0001", "0757632-94.2025.8.07.0001",
+            "0722313-65.2025.8.07.0001", "0768584-35.2025.8.07.0001",
+            "0764797-95.2025.8.07.0001"
+        ]
+        
+        for p in processos:
+            st.markdown(f"""
+                <div class="process-card">
+                    <div class="status-tag">AGUARDANDO ATUALIZAÇÃO</div>
+                    <div style="font-size: 10px; color: #64748B;">Número do Processo</div>
+                    <div class="process-number">{p}</div>
+                </div>
+            """, unsafe_allow_html=True)
+
+    if st.button("Sair", type="secondary"):
         st.session_state.logado = False
+        st.session_state.view = 'home'
         st.rerun()
