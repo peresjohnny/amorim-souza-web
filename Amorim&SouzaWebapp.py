@@ -52,44 +52,6 @@ st.session_state.setdefault("cpf_digits", "")
 
 logo_b64 = get_base64(LOGO_FILE)
 
-ICON_USER = """
-<svg width="22" height="22" viewBox="0 0 24 24" fill="none"
-     xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-  <path d="M12 12c2.761 0 5-2.463 5-5.5S14.761 1 12 1 7 3.463 7 6.5 9.239 12 12 12Z"
-        fill="currentColor" opacity="0.92"/>
-  <path d="M3 22c0-4.418 4.03-8 9-8s9 3.582 9 8"
-        stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-</svg>
-"""
-
-ICON_DOC = """
-<svg width="22" height="22" viewBox="0 0 24 24" fill="none"
-     xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-  <path d="M7 3h7l3 3v15a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"
-        stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M14 3v4a2 2 0 0 0 2 2h4" stroke="currentColor" stroke-width="2"/>
-  <path d="M8 12h8M8 16h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-</svg>
-"""
-
-ICON_HANDSHAKE = """
-<svg width="22" height="22" viewBox="0 0 24 24" fill="none"
-     xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-  <path d="M7 13l3.2 3.2a3 3 0 0 0 4.2 0L17 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-  <path d="M9 11l1.7-1.7a3 3 0 0 1 4.2 0L16 10.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-  <path d="M2 12l4-4 5 5-4 4-5-5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M22 12l-4-4-5 5 4 4 5-5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-</svg>
-"""
-
-BACK_SVG = """
-<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"
-     xmlns="http://www.w3.org/2000/svg">
-  <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.4"
-        stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-"""
-
 # ===== CSS =====
 md(
     """
@@ -118,6 +80,7 @@ html, body{ margin:0 !important; padding:0 !important; height:100% !important; }
 .block-container{ padding:0 !important; margin:0 !important; }
 [data-testid="stMainViewContainer"]{ padding:0 !important; margin:0 !important; }
 
+/* container full-screen */
 #wrap{
   position:fixed;
   inset:0;
@@ -126,22 +89,15 @@ html, body{ margin:0 !important; padding:0 !important; height:100% !important; }
   -webkit-overflow-scrolling:touch;
 }
 
-.inner{
-  width:420px;
-  max-width:94vw;
-  margin:0 auto;
-  padding: 14px var(--pad) 72px var(--pad);
-  text-align:center;
-}
-
-label, small, .stCaption{ display:none !important; }
-
-/* TOPBAR (sem <a>, só layout visual) */
+/* Topbar fixa (resolve a faixa branca em cima) */
 .topbar{
-  position:sticky;
+  position:fixed;
   top:0;
-  z-index:50;
-  height:var(--headerH);
+  left:0;
+  right:0;
+  z-index:9999;
+  height: calc(var(--headerH) + env(safe-area-inset-top));
+  padding-top: env(safe-area-inset-top);
   display:flex;
   align-items:center;
   justify-content:center;
@@ -151,6 +107,7 @@ label, small, .stCaption{ display:none !important; }
   letter-spacing:.06em;
   box-shadow: 0 10px 24px rgba(0,0,0,.10);
 }
+
 .topbar-inner{
   width:420px;
   max-width:94vw;
@@ -159,37 +116,52 @@ label, small, .stCaption{ display:none !important; }
   align-items:center;
   justify-content:center;
   position:relative;
+  height: var(--headerH);
 }
-.topbar-title{ font-weight:900; }
 
-/* Botões pequenos (voltar / sair) */
-.small-btn-row{
-  position:relative;
-  height:0;
+.topbar-title{
+  font-weight:900;
 }
-.small-left, .small-right{
-  position:sticky;
-  top: 8px;
-  z-index:60;
-}
-.small-left{ float:left; margin-left: 12px; }
-.small-right{ float:right; margin-right: 12px; }
 
-div.small-left .stButton > button,
-div.small-right .stButton > button{
+.topbar-actions{
+  position:absolute;
+  right: var(--pad);
+  top:50%;
+  transform: translateY(-50%);
+}
+
+/* Conteúdo começa abaixo da topbar */
+.inner{
+  width:420px;
+  max-width:94vw;
+  margin:0 auto;
+  padding: calc(var(--headerH) + env(safe-area-inset-top) + 14px) var(--pad) 72px var(--pad);
+  text-align:center;
+}
+
+label, small, .stCaption{ display:none !important; }
+
+/* Botão SAIR no topo: pequeno e alinhado */
+.topbar-actions .stButton{
+  width:auto !important;
+  margin:0 !important;
+}
+.topbar-actions .stButton > button{
   width:auto !important;
   height:38px !important;
+  min-height:38px !important;
   padding: 0 12px !important;
-  border-radius:12px !important;
-  border:1px solid rgba(255,255,255,.22) !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(255,255,255,.20) !important;
   background: rgba(255,255,255,.12) !important;
   color: rgba(255,255,255,.95) !important;
-  font-weight:900 !important;
-  letter-spacing:.10em !important;
-  box-shadow:none !important;
+  font-weight: 900 !important;
+  font-size: 12px !important;
+  letter-spacing: .10em !important;
+  box-shadow: none !important;
+  text-align:center !important;
 }
-div.small-left .stButton > button:hover,
-div.small-right .stButton > button:hover{
+.topbar-actions .stButton > button:hover{
   background: rgba(255,255,255,.18) !important;
 }
 
@@ -218,6 +190,7 @@ div.small-right .stButton > button:hover{
   align-items:center;
   justify-content:center;
   color: var(--blue);
+  font-size:20px;
 }
 .user-title{
   font-size:20px;
@@ -233,18 +206,10 @@ div.small-right .stButton > button:hover{
   color: var(--sub);
 }
 
-/* Cards como BOTÕES (sem hiperlink) */
-.card-grid{
-  width:100%;
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  margin-top: 8px;
-}
-
-/* Base: todos botões viram "card" por padrão */
-.stButton{ width:100% !important; }
-.stButton > button{
+/* Cards = botões (sem hyperlink, sem “ponto preto”) */
+.card-grid{ width:100%; margin-top: 8px; }
+.card-grid .stButton{ width:100% !important; margin:0 !important; }
+.card-grid .stButton > button{
   width:100% !important;
   min-height: 132px !important;
   border-radius: 18px !important;
@@ -252,94 +217,64 @@ div.small-right .stButton > button:hover{
   background:#fff !important;
   color: #111827 !important;
   box-shadow: var(--shadow) !important;
-  font-weight:900 !important;
-  font-size: 14px !important;
   padding: 16px !important;
   text-align:left !important;
+
   display:flex !important;
   flex-direction:column !important;
   align-items:flex-start !important;
   justify-content:flex-start !important;
-  gap: 10px !important;
+
+  white-space: pre-line !important; /* permite \n */
+  font-weight: 900 !important;
+  font-size: 14px !important;
 }
-.stButton > button:hover{
+.card-grid .stButton > button:hover{
   border-color: rgba(30,58,138,.22) !important;
 }
-
-/* Conteúdo interno do "card button" */
-.card-icon{
-  width:44px;
-  height:44px;
-  border-radius:16px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background: rgba(45,43,191,.10);
-  border:1px solid rgba(45,43,191,.18);
-  color: var(--blue);
+.card-grid .stButton > button:focus{
+  outline: none !important;
+  box-shadow: var(--shadow) !important;
 }
-.card-title{
-  font-size:14px;
+.card-grid .stButton > button:active{
+  transform: translateY(0px) !important;
+}
+
+/* Processos cards */
+.proc-card{
+  width:100%;
+  border-radius:18px;
+  border:1px solid var(--border);
+  background:#fff;
+  box-shadow: var(--shadow);
+  padding: 14px;
+  margin-bottom: 12px;
+  text-align:left;
+}
+.proc-tag{
+  display:inline-block;
+  background: var(--warnBg);
+  color: var(--warnText);
   font-weight:900;
-  letter-spacing:.08em;
-  color: var(--brand);
+  font-size:10px;
+  padding: 6px 10px;
+  border-radius:10px;
+  letter-spacing:.06em;
+  margin-bottom:10px;
 }
-.card-sub{
-  font-size:12px;
-  font-weight:700;
-  color: rgba(17,24,39,.55);
-  margin-top:-2px;
+.proc-label{
+  font-size:11px;
+  color: rgba(30,58,138,.70);
+  font-weight:800;
 }
-
-/* LOGIN: submit azul (sobrescreve o padrão de card) */
-div[data-testid="stFormSubmitButton"] .stButton > button,
-div[data-testid="stFormSubmitButton"] button{
-  min-height: 54px !important;
-  height: 54px !important;
-  border-radius: 18px !important;
-  border: none !important;
-  background: var(--blue) !important;
-  color:#fff !important;
-  font-weight: 900 !important;
-  font-size: 16px !important;
-  box-shadow: 0 10px 26px rgba(0,0,0,.08) !important;
-  align-items:center !important;
-  justify-content:center !important;
-  text-align:center !important;
-}
-div[data-testid="stFormSubmitButton"] button:hover{
-  background: var(--blue2) !important;
+.proc-number{
+  font-size:14px;
+  color:#111827;
+  font-weight:900;
+  margin-top:6px;
 }
 
-/* INPUT */
-div[data-testid="stTextInput"]{ width: 100% !important; }
-div[data-testid="stTextInput"] [data-baseweb="base-input"]{
-  border: none !important;
-  box-shadow: none !important;
-  background: transparent !important;
-}
-div[data-testid="stTextInput"] [data-baseweb="input"]{
-  width:100% !important;
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-  background: var(--inputBg) !important;
-  border-radius: 18px !important;
-}
-div[data-testid="stTextInput"] input{
-  width:100% !important;
-  height: 54px !important;
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-  background: transparent !important;
-  border-radius: 18px !important;
-  padding: 0 16px !important;
-  font-size: 15px !important;
-  color:#111827 !important;
-}
-
-/* LOGIN visual */
+/* LOGIN */
 .logo-wrap{
   width: 320px;
   max-width: 82vw;
@@ -389,38 +324,52 @@ div[data-testid="stTextInput"] input{
   letter-spacing: .25em;
 }
 
-/* Processos */
-.proc-card{
-  width:100%;
-  border-radius:18px;
-  border:1px solid var(--border);
-  background:#fff;
-  box-shadow: var(--shadow);
-  padding: 14px;
-  margin-bottom: 12px;
-  text-align:left;
+/* TextInput */
+div[data-testid="stTextInput"]{ width: 100% !important; }
+div[data-testid="stTextInput"] [data-baseweb="base-input"]{
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
 }
-.proc-tag{
-  display:inline-block;
-  background: var(--warnBg);
-  color: var(--warnText);
-  font-weight:900;
-  font-size:10px;
-  padding: 6px 10px;
-  border-radius:10px;
-  letter-spacing:.06em;
-  margin-bottom:10px;
+div[data-testid="stTextInput"] [data-baseweb="input"]{
+  width:100% !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: var(--inputBg) !important;
+  border-radius: 18px !important;
 }
-.proc-label{
-  font-size:11px;
-  color: rgba(30,58,138,.70);
-  font-weight:800;
+div[data-testid="stTextInput"] input{
+  width:100% !important;
+  height: 54px !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  border-radius: 18px !important;
+  padding: 0 16px !important;
+  font-size: 15px !important;
+  color:#111827 !important;
 }
-.proc-number{
-  font-size:14px;
-  color:#111827;
-  font-weight:900;
-  margin-top:6px;
+
+/* Submit do form (azul) */
+div[data-testid="stFormSubmitButton"] .stButton > button,
+div[data-testid="stFormSubmitButton"] button{
+  min-height: 54px !important;
+  height: 54px !important;
+  border-radius: 18px !important;
+  border: none !important;
+  background: var(--blue) !important;
+  color:#fff !important;
+  font-weight: 900 !important;
+  font-size: 16px !important;
+  box-shadow: 0 10px 26px rgba(0,0,0,.08) !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+}
+div[data-testid="stFormSubmitButton"] button:hover{
+  background: var(--blue2) !important;
 }
 
 .copy{
@@ -452,7 +401,7 @@ def logout():
     st.rerun()
 
 
-def topbar(title: str):
+def topbar(title: str, show_exit: bool):
     md(
         f"""
 <div class="topbar">
@@ -462,6 +411,12 @@ def topbar(title: str):
 </div>
 """
     )
+    if show_exit:
+        # Renderiza o botão no canto direito por cima da barra
+        md('<div class="topbar"><div class="topbar-inner"><div class="topbar-actions">')
+        if st.button("SAIR", key=f"exit_{title}"):
+            logout()
+        md("</div></div></div>")
 
 
 def view_login():
@@ -505,27 +460,13 @@ def view_login():
 
 def view_dashboard():
     md('<div id="wrap">')
-    topbar("Dashboard")
-
-    # botões no topo (SEM <a>)
-    md('<div class="small-btn-row">')
-    with st.container():
-        c1, c2, c3 = st.columns([1, 6, 1])
-        with c1:
-            pass
-        with c3:
-            md('<div class="small-right">')
-            if st.button("SAIR", key="btn_sair_dash"):
-                logout()
-            md("</div>")
-    md("</div>")
-
+    topbar("Dashboard", show_exit=True)
     md('<div class="inner">')
 
     md(
         f"""
 <div class="user-card">
-  <div class="avatar">{ICON_USER}</div>
+  <div class="avatar">👤</div>
   <div>
     <div class="user-title">Olá, {CLIENT_NAME}</div>
     <div class="user-sub">Selecione uma opção</div>
@@ -534,26 +475,18 @@ def view_dashboard():
 """
     )
 
-    # grid de cards clicáveis (são botões, sem hyperlink)
+    md('<div class="card-grid">')
     c1, c2 = st.columns(2, gap="large")
 
     with c1:
-        md(f"""
-<div class="card-icon">{ICON_DOC}</div>
-<div class="card-title">PROCESSOS</div>
-<div class="card-sub">Consultar andamento</div>
-""")
-        if st.button(" ", key="go_processos", help="Abrir Processos"):
+        # Botão-card: 2 linhas sem hyperlink
+        if st.button("📄  PROCESSOS\nConsultar andamento", key="go_processos"):
             goto("processos")
 
     with c2:
-        md(f"""
-<div class="card-icon">{ICON_HANDSHAKE}</div>
-<div class="card-title">ACORDOS</div>
-<div class="card-sub">Ver propostas</div>
-""")
-        if st.button(" ", key="go_acordos", help="Abrir Acordos"):
+        if st.button("🤝  ACORDOS\nVer propostas", key="go_acordos"):
             goto("acordos")
+    md("</div>")
 
     md("</div></div>")
     md('<div class="copy">© AMR SOFTWARES</div>')
@@ -561,25 +494,14 @@ def view_dashboard():
 
 def view_processos():
     md('<div id="wrap">')
-    topbar("Processos")
-
-    # botões topo (voltar / sair) sem <a>
-    md('<div class="small-btn-row">')
-    with st.container():
-        c1, c2, c3 = st.columns([1, 6, 1])
-        with c1:
-            md('<div class="small-left">')
-            if st.button("◀", key="btn_back_proc"):
-                goto("dashboard")
-            md("</div>")
-        with c3:
-            md('<div class="small-right">')
-            if st.button("SAIR", key="btn_sair_proc"):
-                logout()
-            md("</div>")
-    md("</div>")
-
+    topbar("Processos", show_exit=True)
     md('<div class="inner">')
+
+    # Voltar como botão normal (sem hack)
+    if st.button("◀  Voltar", key="back_proc"):
+        goto("dashboard")
+
+    md("<div style='height:10px'></div>")
 
     for p in PROCESSOS:
         md(
@@ -598,25 +520,15 @@ def view_processos():
 
 def view_acordos():
     md('<div id="wrap">')
-    topbar("Acordos")
-
-    md('<div class="small-btn-row">')
-    with st.container():
-        c1, c2, c3 = st.columns([1, 6, 1])
-        with c1:
-            md('<div class="small-left">')
-            if st.button("◀", key="btn_back_acord"):
-                goto("dashboard")
-            md("</div>")
-        with c3:
-            md('<div class="small-right">')
-            if st.button("SAIR", key="btn_sair_acord"):
-                logout()
-            md("</div>")
-    md("</div>")
-
+    topbar("Acordos", show_exit=True)
     md('<div class="inner">')
+
+    if st.button("◀  Voltar", key="back_acord"):
+        goto("dashboard")
+
+    md("<div style='height:10px'></div>")
     st.info("Em atualização")
+
     md("</div></div>")
     md('<div class="copy">© AMR SOFTWARES</div>')
 
