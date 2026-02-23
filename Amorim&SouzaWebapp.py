@@ -36,15 +36,14 @@ def format_cpf_digits(d: str) -> str:
 if "logado" not in st.session_state:
     st.session_state["logado"] = False
 if "tela" not in st.session_state:
-    st.session_state["tela"] = "login"  # login | dashboard | processos
+    st.session_state["tela"] = "login"
 if "cpf_visual" not in st.session_state:
     st.session_state["cpf_visual"] = ""
 if "cpf_digits" not in st.session_state:
     st.session_state["cpf_digits"] = ""
 
-logo_b64 = get_base64("1000423374.jpg")  # nome ORIGINAL no GitHub
+logo_b64 = get_base64("1000423374.jpg")  # nome original
 
-# ===== CSS =====
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
@@ -74,7 +73,7 @@ body{overflow:hidden !important;}
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:22px 18px 60px 18px;
+  padding:18px 18px 58px 18px;
   overflow:hidden;
 }
 .hero-inner{
@@ -85,11 +84,14 @@ body{overflow:hidden !important;}
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  text-align:center;
+  text-align:center !important;
 }
 
-/* centraliza markdown */
-#hero .stMarkdown, #hero [data-testid="stMarkdown"]{
+/* Força centralização de qualquer markdown/elemento do Streamlit dentro do hero */
+#hero .stMarkdown, 
+#hero [data-testid="stMarkdown"],
+#hero .element-container,
+#hero [data-testid="stVerticalBlock"]{
   width:100% !important;
   margin:0 auto !important;
   text-align:center !important;
@@ -99,7 +101,7 @@ body{overflow:hidden !important;}
 .logo-wrapper{
   width:320px;
   max-width:82vw;
-  height:260px;
+  height:248px;              /* um pouco menor pra não “empurrar” layout */
   overflow:hidden;
   position:relative;
   display:flex;
@@ -109,75 +111,95 @@ body{overflow:hidden !important;}
 }
 .logo{
   width:190%;
-  transform:translateY(-14px);
+  transform:translateY(-10px);   /* ajusta o corte (cintura) sem comer a mão */
 }
 .logo-wrapper::after{
   content:"";
   position:absolute;
   left:0; right:0; bottom:0;
-  height:86px;
+  height:84px;
   background:linear-gradient(180deg,
     rgba(255,255,255,0) 0%,
-    rgba(255,255,255,.82) 55%,
+    rgba(255,255,255,.86) 55%,
     rgba(255,255,255,1) 100%);
 }
 
 /* ===== TEXT ===== */
 .brand{
+  width:100%;
+  text-align:center !important;
   font-size:32px;
   font-weight:900;
   letter-spacing:.10em;
   color:var(--brand);
-  margin:2px 0;
+  margin:2px auto 0 auto;
 }
 .subtitle{
+  width:100%;
+  text-align:center !important;   /* trava no centro */
   font-size:12px;
   letter-spacing:.25em;
   font-weight:800;
   color:var(--sub);
-  margin-bottom:18px;
+  margin:10px auto 16px auto;
 }
 
-/* ===== INPUT ===== */
-div[data-testid="stTextInput"]{ width:100% !important; }
+/* ===== INPUT (remove bordas/outline/efeitos feios e evita corte) ===== */
+div[data-testid="stTextInput"]{
+  width:100% !important;
+}
+div[data-testid="stTextInput"] > div{
+  overflow:visible !important;       /* evita “corte” do input */
+}
 div[data-testid="stTextInput"] input{
   width:100% !important;
-  height:56px !important;
+  height:54px !important;            /* ligeiramente menor e mais elegante */
   border-radius:var(--radius) !important;
   border:none !important;
   outline:none !important;
+  box-shadow:none !important;
+  -webkit-appearance:none !important;
+  appearance:none !important;
   padding:0 16px !important;
   font-size:15px !important;
   background:var(--inputBg) !important;
+  color:#111827 !important;
 }
 div[data-testid="stTextInput"] input:focus{
-  box-shadow:0 0 0 2px rgba(31,45,191,.22) !important;
+  border:none !important;
+  outline:none !important;
+  box-shadow:0 0 0 2px rgba(45,43,191,.18) !important; /* glow leve e limpo */
   background:#FFFFFF !important;
 }
 
-/* ===== BUTTON ===== */
-.stButton{ width:100% !important; }
+/* ===== BUTTON (menos “grosso”) ===== */
+.stButton{
+  width:100% !important;
+  margin-top:12px !important;
+}
 .stButton > button{
   width:100% !important;
-  height:64px !important;
+  height:56px !important;            /* reduz altura */
   border-radius:var(--radius) !important;
   border:none !important;
   background:var(--btn) !important;
   color:#FFF !important;
-  font-size:17px !important;
+  font-size:16px !important;
   font-weight:800 !important;
-  box-shadow:0 4px 12px rgba(0,0,0,.12) !important;
+  box-shadow:0 3px 10px rgba(0,0,0,.10) !important;  /* mais flat */
   display:flex !important;
   align-items:center !important;
   justify-content:center !important;
   text-align:center !important;
+  padding:0 16px !important;
 }
 .stButton > button:hover{ background:var(--btnHover) !important; }
-.stButton > button:active{ transform:scale(.98) !important; }
+.stButton > button:active{ transform:scale(.99) !important; }
 
+/* remove labels */
 label, small, .stCaption{display:none !important;}
 
-/* ===== DASHBOARD ===== */
+/* ===== DASHBOARD CARDS ===== */
 .topbar{
   width:100%;
   display:flex;
@@ -190,27 +212,6 @@ label, small, .stCaption{display:none !important;}
   font-weight:800;
   color:var(--brand);
 }
-.card-row{
-  width:100%;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-  margin:10px 0 18px 0;
-}
-.action{
-  background:#FFFFFF;
-  border:1px solid rgba(30,58,138,.12);
-  border-radius:16px;
-  padding:14px 12px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-  font-weight:800;
-  color:var(--brand);
-  box-shadow:0 6px 18px rgba(0,0,0,.06);
-}
-.action span{font-size:18px;}
 .section-title{
   width:100%;
   text-align:left;
@@ -259,8 +260,6 @@ label, small, .stCaption{display:none !important;}
 </style>
 """, unsafe_allow_html=True)
 
-# ====== VIEWS ======
-
 def view_login():
     st.markdown('<div id="hero"><div class="hero-inner">', unsafe_allow_html=True)
 
@@ -296,7 +295,6 @@ def view_login():
     st.markdown("</div></div>", unsafe_allow_html=True)
     st.markdown('<div class="copy">© AMR SOFTWARES</div>', unsafe_allow_html=True)
 
-
 def view_dashboard():
     st.markdown('<div id="hero"><div class="hero-inner">', unsafe_allow_html=True)
 
@@ -306,7 +304,6 @@ def view_dashboard():
     </div>
     """, unsafe_allow_html=True)
 
-    # Ações
     c1, c2 = st.columns(2, gap="small")
     with c1:
         if st.button("📄  Processos", use_container_width=True):
@@ -317,7 +314,6 @@ def view_dashboard():
             st.warning("Em atualização.")
 
     st.markdown('<div class="section-title">Últimos Processos</div>', unsafe_allow_html=True)
-
     for p in PROCESSOS[:3]:
         st.markdown(f"""
         <div class="pcard">
@@ -336,11 +332,10 @@ def view_dashboard():
     st.markdown("</div></div>", unsafe_allow_html=True)
     st.markdown('<div class="copy">© AMR SOFTWARES</div>', unsafe_allow_html=True)
 
-
 def view_processos():
     st.markdown('<div id="hero"><div class="hero-inner">', unsafe_allow_html=True)
 
-    st.markdown(f"""
+    st.markdown("""
     <div class="topbar">
       <div class="hello">Processos</div>
     </div>
@@ -369,7 +364,6 @@ def view_processos():
 
     st.markdown("</div></div>", unsafe_allow_html=True)
     st.markdown('<div class="copy">© AMR SOFTWARES</div>', unsafe_allow_html=True)
-
 
 # ===== ROUTER =====
 if not st.session_state["logado"]:
